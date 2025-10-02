@@ -5,6 +5,7 @@ import { MedicalCard } from "@/components/ui/MedicalCard";
 import heroImage from "@/assets/hero-medical.jpg";
 import servicesImage from "@/assets/services-icons.jpg";
 import productsImage from "@/assets/products-display.jpg";
+import Layout from "@/components/layout/Layout";
 
 const services = [
   {
@@ -67,6 +68,7 @@ const stats = [
 
 export default function Home() {
   return (
+    <Layout>
     <div>
       {/* Hero Section */}
       <section className="medical-hero">
@@ -324,5 +326,6 @@ export default function Home() {
         </div>
       </section>
     </div>
+    </Layout>
   );
 }

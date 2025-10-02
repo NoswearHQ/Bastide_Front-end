@@ -38,10 +38,11 @@ export default function Footer() {
             {/* Contact Info */}
             <div className="lg:col-span-1">
               <div className="flex items-center space-x-2 mb-6">
-                <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">M</span>
-                </div>
-                <span className="text-xl font-bold text-white">MedicalCare</span>
+              <img 
+                src="/lovable-uploads/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
+                alt="Bastide - Le confort médical" 
+style={{width: '100px', height: '50px'}}              />
+          
               </div>
               
               <div className="space-y-4 text-gray-300">
