@@ -6,42 +6,47 @@ import heroImage from "@/assets/hero-medical.jpg";
 import servicesImage from "@/assets/services-icons.jpg";
 import productsImage from "@/assets/products-display.jpg";
 import Layout from "@/components/layout/Layout";
+import { useEffect, useState } from "react";
+import { getCategories, type Category } from "@/lib/api";
+import CategoryPillarsDynamic from "@/components/catalog/CategoryPillarsDynamic";
 
+const PillarCard = ({ title, categoryId }: { title: string; categoryId: string }) => (
+  <Link
+    to={`/produits?categoryId=${categoryId}`}
+    className="block p-6 rounded-xl shadow-medical hover:shadow-medical-xl transition"
+  >
+    <div className="text-lg font-semibold mb-1">{title}</div>
+    <div className="text-sm text-gray-600">Découvrir</div>
+  </Link>
+);
 const services = [
   {
-    icon: Heart,
-    title: "Consultations médicales",
-    description: "Consultations spécialisées avec nos praticiens expérimentés pour un suivi personnalisé de votre santé.",
+    icon: Shield,
+    title: "Assistance respiratoire",
+    description:
+      "Apnée du sommeil (PPC/CPAP), oxygénothérapie et VNI : installation à domicile, formation et suivi personnalisé.",
   },
   {
-    icon: Shield,
-    title: "Médecine préventive",
-    description: "Programmes de dépistage et de prévention pour anticiper et prévenir les problèmes de santé.",
+    icon: Heart,
+    title: "Location de matériel médical",
+    description:
+      "Lit médicalisé, fauteuil roulant, matelas à air, verticalisateur, lève-personne : livraison et installation rapides.",
   },
   {
     icon: Users,
-    title: "Soins d'équipe",
-    description: "Approche pluridisciplinaire avec coordination entre spécialistes pour une prise en charge optimale.",
+    title: "Conseil & accompagnement",
+    description:
+      "Évaluation du besoin, choix du matériel, prise en charge, maintenance et support continu.",
   },
 ];
 
+
 const features = [
-  {
-    title: "Équipe médicale experte",
-    description: "Praticiens diplômés et spécialisés",
-  },
-  {
-    title: "Technologie de pointe", 
-    description: "Équipements médicaux dernière génération",
-  },
-  {
-    title: "Suivi personnalisé",
-    description: "Accompagnement adapté à chaque patient",
-  },
-  {
-    title: "Disponibilité 24/7",
-    description: "Service d'urgence disponible en permanence",
-  },
+  { title: "Installation & formation à domicile", description: "Par des techniciens spécialisés." },
+  { title: "Astreinte 24/7 (Oxygénothérapie)", description: "Réponse aux urgences respiratoires." },
+  { title: "Matériel certifié & récent", description: "Équipements conformes et performants." },
+  { title: "Suivi et maintenance", description: "Entretien et support technique continus." },
+  { title: "Depuis 1977", description: "Savoir-faire historique du Groupe Bastide." },
 ];
 
 const testimonials = [
@@ -65,8 +70,38 @@ const stats = [
   { value: "15", label: "Spécialistes" },
   { value: "98%", label: "Satisfaction patient" },
 ];
-
+const productPillars = [
+  { title: "Fauteuils releveurs", href: "/produits/fauteuils-releveurs" },
+  { title: "Incontinence", href: "/produits/incontinence" },
+  { title: "Mobilité", href: "/produits/mobilite" },
+  { title: "Matériel médical", href: "/produits/materiel-medical" },
+];
 export default function Home() {
+  const [cats, setCats] = useState<Category[]>([]);
+  const [loadingCats, setLoadingCats] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const { rows } = await getCategories({ limit: 200 });
+        setCats(rows);
+      } finally {
+        setLoadingCats(false);
+      }
+    })();
+  }, []);
+
+  // On cible les 4 “piliers” par slug (ou par nom si tu préfères)
+  const wantedSlugs = new Map<string, string>([
+    ["fauteuils-releveurs", "Fauteuils releveurs"],
+    ["incontinence", "Incontinence"],
+    ["mobilite", "Mobilité"],
+    ["materiel-medical", "Matériel médical"],
+  ]);
+
+  const pillars = cats
+    .filter(c => wantedSlugs.has(c.slug))
+    .map(c => ({ title: wantedSlugs.get(c.slug)!, id: c.id }));
   return (
     <Layout>
     <div>
@@ -204,59 +239,21 @@ export default function Home() {
       </section>
 
       {/* Products Section */}
-      <section className="medical-section">
-        <div className="medical-container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Produits médicaux
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Découvrez notre sélection de produits et équipements médicaux
-              de qualité professionnelle.
-            </p>
-          </div>
+     
+<section className="medical-section">
+  <div className="medical-container">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-bold text-gray-900 mb-4">Produits médicaux</h2>
+      <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        Découvrez notre sélection de matériel médical (vente et location).
+      </p>
+    </div>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Équipements de pointe
-              </h3>
-              <p className="text-lg text-gray-600 mb-6">
-                Nous utilisons et proposons les dernières innovations en matière
-                d'équipements médicaux pour garantir des soins optimaux.
-              </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-medical-primary" />
-                  <span>Matériel certifié CE et FDA</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-medical-primary" />
-                  <span>Maintenance et support technique</span>
-                </li>
-                <li className="flex items-center space-x-3">
-                  <CheckCircle className="h-5 w-5 text-medical-primary" />
-                  <span>Formation à l'utilisation</span>
-                </li>
-              </ul>
-              <MedicalButton variant="primary" asChild>
-                <Link to="/produits">
-                  Voir nos produits
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </MedicalButton>
-            </div>
-            
-            <div>
-              <img
-                src={productsImage}
-                alt="Produits et équipements médicaux professionnels"
-                className="w-full h-[400px] object-cover rounded-xl shadow-medical"
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+    <CategoryPillarsDynamic limit={4} onlyTopLevel orderBy="desc" />
+
+   
+  </div>
+</section>
 
       {/* Testimonials Section */}
       <section className="medical-section bg-gray-50">

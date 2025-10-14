@@ -23,10 +23,9 @@ const footerNavigation = {
 };
 
 const socialMedia = [
-  { name: "Facebook", icon: Facebook, href: "#" },
-  { name: "Twitter", icon: Twitter, href: "#" },
-  { name: "LinkedIn", icon: Linkedin, href: "#" },
-  { name: "Instagram", icon: Instagram, href: "#" },
+  { name: "Facebook", icon: Facebook, href: "https://www.facebook.com/bastide.tn/?locale=fr_FR" },
+  { name: "LinkedIn", icon: Linkedin, href: "https://www.linkedin.com/company/bastide-le-confort-m%C3%A9dical-tunisie/about/" },
+  { name: "Instagram", icon: Instagram, href: "https://www.instagram.com/bastidetunisie/?hl=fr" },
 ];
 
 export default function Footer() {
@@ -37,43 +36,50 @@ export default function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {/* Contact Info */}
             <div className="lg:col-span-1">
-              <div className="flex items-center space-x-2 mb-6">
-              <img 
-                src="/lovable-uploads/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
-                alt="Bastide - Le confort médical" 
-style={{width: '100px', height: '50px'}}              />
-          
-              </div>
-              
-              <div className="space-y-4 text-gray-300">
-                <div className="flex items-start space-x-3">
-                  <MapPin className="h-5 w-5 mt-0.5 text-medical-primary flex-shrink-0" />
-                  <div>
-                    <p>123 Avenue de la Santé</p>
-                    <p>75016 Paris, France</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <Phone className="h-5 w-5 text-medical-primary flex-shrink-0" />
-                  <span>01 23 45 67 89</span>
-                </div>
-                
-                <div className="flex items-center space-x-3">
-                  <Mail className="h-5 w-5 text-medical-primary flex-shrink-0" />
-                  <span>contact@medicalcare.fr</span>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <Clock className="h-5 w-5 mt-0.5 text-medical-primary flex-shrink-0" />
-                  <div>
-                    <p>Lun - Ven : 8h - 19h</p>
-                    <p>Sam : 9h - 17h</p>
-                    <p>Urgences 24h/24</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+  <div className="flex items-center space-x-2 mb-6">
+    <img 
+      src="/lovable-uploads/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
+      alt="Bastide Tunisie - Le confort médical" 
+      style={{ width: "110px", height: "55px" }}
+    />
+  </div>
+
+  <div className="space-y-4 text-gray-300">
+    {/* Adresse */}
+    <div className="flex items-start space-x-3">
+      <MapPin className="h-5 w-5 mt-0.5 text-medical-primary flex-shrink-0" />
+      <div>
+        <p>Centre Urbain Nord, Immeuble Express</p>
+        <p>Tunis, Tunisie 1082</p>
+      </div>
+    </div>
+
+    {/* Téléphone */}
+    <div className="flex items-center space-x-3">
+      <Phone className="h-5 w-5 text-medical-primary flex-shrink-0" />
+      <span>71 947 353</span>
+    </div>
+
+    {/* Email */}
+    <div className="flex items-center space-x-3">
+      <Mail className="h-5 w-5 text-medical-primary flex-shrink-0" />
+      <span>contact@bastidemedical.tn</span>
+    </div>
+
+    {/* Horaires */}
+    <div className="flex items-start space-x-3">
+      <Clock className="h-5 w-5 mt-0.5 text-medical-primary flex-shrink-0" />
+      <div>
+        <p>Lun - Ven : 8h30 - 18h30</p>
+        <p>Samedi : 9h - 13h</p>
+        <p>Urgences : 24h/24 - 7j/7</p>
+      </div>
+    </div>
+
+   
+  </div>
+</div>
+
 
             {/* Services */}
             <div>
