@@ -1,4 +1,5 @@
 import { Heart, Leaf, Users, Shield, Award, Lightbulb, Globe, Handshake } from "lucide-react";
+import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalCard } from "@/components/ui/MedicalCard";
@@ -275,12 +276,12 @@ export default function Engagements() {
             pour construire l'avenir de la santé ensemble.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="bg-white text-medical-primary px-8 py-4 rounded-lg font-medium hover:bg-gray-100 transition-colors">
-              Nous rejoindre
-            </button>
-            <button className="border-2 border-white text-white px-8 py-4 rounded-lg font-medium hover:bg-white hover:text-medical-primary transition-colors">
-              Partenariats
-            </button>
+          <Link to="/contact">
+  <button className="bg-white text-medical-primary px-8 py-4 rounded-lg font-medium hover:bg-gray-100 transition-colors">
+    Nous rejoindre
+  </button>
+</Link>
+
           </div>
         </div>
       </section>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Heart, Brain, Eye, Baby, Bone, Activity, Plus, Minus, Clock, CheckCircle, Phone } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
@@ -108,6 +108,9 @@ const emergencyServices = [
 ];
 
 export default function Services() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   const toggleFaq = (index: number) => {

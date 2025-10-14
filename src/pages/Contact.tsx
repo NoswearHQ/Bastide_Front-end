@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
@@ -6,20 +6,27 @@ import { MedicalButton } from "@/components/ui/medical-button";
 
 const contactInfo = {
   address: {
-    street: "123 Avenue de la Santé",
-    city: "75016 Paris",
-    country: "France",
+    street: "Centre Urbain Nord, Immeuble Express",
+    city: "Tunis",
+    postalCode: "1082",
+    country: "Tunisie",
   },
-  phone: "01 23 45 67 89",
-  email: "contact@medicalcare.fr",
-  emergency: "01 23 45 67 80",
+  phone: "71 947 353",
+  email: "contact@bastidemedical.tn",
+  emergency: "+216 71 947 353",
   hours: {
-    weekdays: "Lundi - Vendredi : 8h00 - 19h00",
-    saturday: "Samedi : 9h00 - 17h00",
-    sunday: "Dimanche : Urgences uniquement",
+    weekdays: "Lundi - Vendredi : 8h30 - 18h30",
+    saturday: "Samedi : 9h00 - 13h00",
+    sunday: "Dimanche : Fermé",
     emergency: "Urgences : 24h/24 - 7j/7",
   },
+  social: {
+    facebook: "https://www.facebook.com/bastide.tn",
+    instagram: "https://www.instagram.com/bastidetunisie/?hl=fr",
+    linkedin: "https://www.linkedin.com/company/bastide-le-confort-m%C3%A9dical-tunisie?originalSubdomain=tn",
+  },
 };
+
 
 const departments = [
   "Cardiologie",
@@ -33,6 +40,10 @@ const departments = [
 ];
 
 export default function Contact() {
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -349,11 +360,22 @@ export default function Contact() {
 
               {/* Map Placeholder */}
               <div className="mt-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Plan d'accès</h3>
-                <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                  <p className="text-gray-500">Carte interactive</p>
-                </div>
-              </div>
+  <h3 className="text-lg font-semibold text-gray-900 mb-4">Plan d'accès</h3>
+
+  <div className="aspect-video rounded-lg overflow-hidden shadow-medical">
+    <iframe
+      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4801.694218220384!2d10.197813199999999!3d36.8469099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd34c60fa8cfd5%3A0xf97a6e0ea6ef705e!2sBastide!5e1!3m2!1sfr!2stn!4v1760094910667!5m2!1sfr!2stn"
+      width="100%"
+      height="100%"
+      style={{ border: 0 }}
+      allowFullScreen
+      loading="lazy"
+      referrerPolicy="no-referrer-when-downgrade"
+      title="Carte Bastide Tunisie"
+    ></iframe>
+  </div>
+</div>
+
             </div>
           </div>
         </div>
@@ -370,14 +392,7 @@ export default function Contact() {
               En cas d'urgence vitale, ne passez pas par ce formulaire.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="bg-white p-4 rounded-lg shadow-md">
-                <p className="text-sm text-gray-600 mb-1">SAMU</p>
-                <p className="text-2xl font-bold text-red-600">15</p>
-              </div>
-              <div className="bg-white p-4 rounded-lg shadow-md">
-                <p className="text-sm text-gray-600 mb-1">Urgences européennes</p>
-                <p className="text-2xl font-bold text-red-600">112</p>
-              </div>
+              
               <div className="bg-white p-4 rounded-lg shadow-md">
                 <p className="text-sm text-gray-600 mb-1">Notre service d'urgence</p>
                 <p className="text-2xl font-bold text-red-600">{contactInfo.emergency}</p>
