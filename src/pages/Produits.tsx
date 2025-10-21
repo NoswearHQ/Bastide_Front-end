@@ -387,15 +387,17 @@ const handlePageChange = (page: number) => {
     <MedicalCard key={product.id} className="h-full flex flex-col">
  <div className="relative">
   <div className="aspect-square bg-gray-200 rounded-t-xl flex items-center justify-center overflow-hidden">
-    <img
-      src={safeProductImage(product.image)}
-      alt={product.name}
-      className={`w-full h-full ${
-        product.image?.includes("bastidelogo.png")
-          ? "object-contain p-6"
-          : "object-cover"
-      }`}
-    />
+  <img
+  src={safeProductImage(product.image ?? product.image)}
+  alt={product.name}
+  className={`w-full max-w-[300px] h-auto ${
+    product.image?.includes("bastidelogo.png")
+      ? "object-contain p-6"
+      : "object-cover"
+  }`}
+  loading="lazy"
+/>
+
   </div>
 </div>
 
@@ -415,7 +417,11 @@ const handlePageChange = (page: number) => {
       {/* Row 2: titre (clamp 2 lignes) + rating */}
       <div>
         <div className="clamp-2 line-clamp-2">
-          <MedicalCard.Title>{product.name}</MedicalCard.Title>
+        <MedicalCard.Title>{product.name}</MedicalCard.Title>
+{product.reference && (
+  <p className="text-sm text-gray-500 mt-1">Réf : {product.reference}</p>
+)}
+
         </div>
         <div className="flex items-center space-x-2 mt-2">
           <div className="flex">{renderStars(4)}</div>
@@ -549,6 +555,8 @@ const handlePageChange = (page: number) => {
 function ProductDetailsView({ product }: { product: ProductDetail }) {
   const gallery = useMemo(() => {
     const list: string[] = [];
+    console.log(product)
+
     if (product.image_miniature) list.push(imageUrl(product.image_miniature));
 
     const fromJson = parseGallery(product.galerie_json) || [];

@@ -3,6 +3,7 @@ import type { Product } from "../lib/api";
 import { imageUrl, parseGallery } from "../lib/images";
 
 export type UiProduct = {
+    reference: any;
     id: string;
     name: string;
     category: string;
