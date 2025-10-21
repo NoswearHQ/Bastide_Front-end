@@ -52,15 +52,19 @@ export function fetchPublic<T>(path: string, options: RequestInit = {}): Promise
 export async function fetchWithAuth<T>(path: string, options: RequestInit = {}): Promise<T> {
   const { accessToken, refreshToken } = tokenStore.get();
 
-  const doFetch = (token?: string) =>
-    fetchJson<T>(`${API_BASE}${path}`, {
+  const doFetch = (token?: string) => {
+    const isFormData = options.body instanceof FormData;
+  
+    return fetchJson<T>(`${API_BASE}${path}`, {
       ...options,
       headers: {
-        "Content-Type": "application/json",
+        ...(isFormData ? {} : { "Content-Type": "application/json" }),
         ...(options.headers || {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
     });
+  };
+  
 
   try {
     return await doFetch(accessToken || undefined);
@@ -90,27 +94,24 @@ export type Category = {
   slug: string;
   parent_id?: string | null;
 };
-
 export type Product = {
   id: string;
+  reference?: string | null; // 🆕 optionnel
   titre: string;
   slug: string;
-
   prix: string | null;
   devise: string;
-
-  image_miniature: string | null;   // "images/<slug>/<file>"
-  galerie_json: string | null;      // JSON string: ["images/...","images/..."]
-
+  image_miniature: string | null;
+  galerie_json: string | null;
   categorie_id: string;
   sous_categorie_id: string;
-
-  // champs supplémentaires possibles en show()
+  est_actif: boolean;
   seo_description?: string | null;
   seo_titre?: string | null;
   description_courte?: string | null;
   description_html?: string | null;
 };
+
 
 export type Article = {
   id: string;
@@ -220,3 +221,65 @@ export type ProductDetail = Product & {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   }
+// ---------- Endpoints CRUD Catégories ----------
+
+// ✅ Type complet aligné avec le contrôleur Symfony
+export type CategoryFull = {
+  id: number;
+  nom: string;
+  slug: string;
+  position: number;
+  est_active: boolean;
+  parent_id?: number | null;
+  cree_le: string;
+  modifie_le: string;
+};
+
+// 🔹 Récupération paginée des catégories (publique)
+export async function getCategoriesFull(params?: {
+  search?: string;
+  page?: number;
+  limit?: number;
+}): Promise<Paginated<CategoryFull>> {
+  const p = new URLSearchParams();
+  if (params?.search) p.set("search", params.search);
+  if (params?.page) p.set("page", String(params.page));
+  if (params?.limit) p.set("limit", String(params.limit));
+  const qs = p.toString();
+  return fetchPublic<Paginated<CategoryFull>>(`/crud/categories${qs ? `?${qs}` : ""}`);
+}
+
+// 🔹 Récupération d’une catégorie par ID (publique)
+export async function getCategoryById(id: number): Promise<CategoryFull> {
+  return fetchPublic<CategoryFull>(`/crud/categories/${id}`);
+}
+
+// 🔹 Création (protégée)
+export async function createCategory(payload: {
+  nom: string;
+  slug: string;
+  position?: number;
+  est_active?: boolean;
+  parent_id?: number | null;
+}) {
+  return fetchWithAuth<{ id: number }>(`/crud/categories`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+// 🔹 Mise à jour partielle (protégée)
+export async function patchCategory(
+  id: number,
+  payload: Partial<Omit<CategoryFull, "id" | "cree_le" | "modifie_le">>
+) {
+  return fetchWithAuth<{ ok: true }>(`/crud/categories/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+// 🔹 Suppression (protégée)
+export async function deleteCategory(id: number) {
+  return fetchWithAuth<void>(`/crud/categories/${id}`, { method: "DELETE" });
+}

@@ -11,9 +11,9 @@ const contactInfo = {
     postalCode: "1082",
     country: "Tunisie",
   },
-  phone: "71 947 353",
+  phone: "29 38 08 98",
   email: "contact@bastidemedical.tn",
-  emergency: "+216 71 947 353",
+  emergency: "+216 29 38 08 98",
   hours: {
     weekdays: "Lundi - Vendredi : 8h30 - 18h30",
     saturday: "Samedi : 9h00 - 13h00",
@@ -322,7 +322,6 @@ export default function Contact() {
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Téléphone</h3>
                     <p className="text-gray-600">
-                      Standard : {contactInfo.phone}<br />
                       Urgences : {contactInfo.emergency}
                     </p>
                   </div>
@@ -359,22 +358,73 @@ export default function Contact() {
               </div>
 
               {/* Map Placeholder */}
-              <div className="mt-8">
-  <h3 className="text-lg font-semibold text-gray-900 mb-4">Plan d'accès</h3>
+             {/* Boutiques et plans d’accès */}
+<div className="mt-10 space-y-10">
+  {/* Boutique 1 */}
+  <div>
+    <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+      <MapPin className="h-5 w-5 text-medical-primary" />
+      Bastide Centre Urbain Nord
+    </h3>
+    <p className="text-gray-600 mb-4">
+      Centre Urbain Nord, Immeuble Express<br />
+      Tunis, Tunisie<br />
+      <a
+        href="https://maps.app.goo.gl/QF2faGBzRSJk7nqg8"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-medical-primary hover:underline text-sm"
+      >
+        Ouvrir dans Google Maps
+      </a>
+    </p>
 
-  <div className="aspect-video rounded-lg overflow-hidden shadow-medical">
-    <iframe
-      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d4801.694218220384!2d10.197813199999999!3d36.8469099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd34c60fa8cfd5%3A0xf97a6e0ea6ef705e!2sBastide!5e1!3m2!1sfr!2stn!4v1760094910667!5m2!1sfr!2stn"
-      width="100%"
-      height="100%"
-      style={{ border: 0 }}
-      allowFullScreen
-      loading="lazy"
-      referrerPolicy="no-referrer-when-downgrade"
-      title="Carte Bastide Tunisie"
-    ></iframe>
+    <div className="aspect-video rounded-lg overflow-hidden shadow-medical">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1279.478219862285!2d10.197813199999999!3d36.8469099!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd34c60fa8cfd5%3A0xf97a6e0ea6ef705e!2sBastide%20Centre%20Urbain%20Nord!5e0!3m2!1sfr!2stn!4v1728984910667!5m2!1sfr!2stn"
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        title="Bastide Centre Urbain Nord"
+      ></iframe>
+    </div>
+  </div>
+
+  {/* Boutique 2 */}
+  <div>
+    <h3 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">
+      <MapPin className="h-5 w-5 text-medical-primary" />
+      Bastide L’Aouina
+    </h3>
+    <p className="text-gray-600 mb-4">
+      Avenue de l’Aouina<br />
+      Tunis, Tunisie<br />
+      <a
+        href="https://maps.app.goo.gl/Noj54UvC9Vx4iP6WA"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-medical-primary hover:underline text-sm"
+      >
+        Ouvrir dans Google Maps
+      </a>
+    </p>
+
+    <div className="aspect-video rounded-lg overflow-hidden shadow-medical">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1279.6067068790628!2d10.268620799999999!3d36.8509026!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd352f97ef8de9%3A0x5b94d7e76cc84408!2sBastide%20L&#39;Aouina!5e0!3m2!1sfr!2stn!4v1728984988771!5m2!1sfr!2stn"
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        title="Bastide L’Aouina"
+      ></iframe>
+    </div>
   </div>
 </div>
+
 
             </div>
           </div>

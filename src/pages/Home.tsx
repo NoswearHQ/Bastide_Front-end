@@ -2,7 +2,11 @@ import { ArrowRight, Heart, Shield, Users, Clock, CheckCircle, Star } from "luci
 import { Link } from "react-router-dom";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
-import heroImage from "@/assets/hero-medical.jpg";
+import heroImage from "@/assets/hero-medical1.jpg";
+import Service1Image from "@/assets/s1.jpg";
+import Service2Image from "@/assets/s2.jpg";
+import Service3Image from "@/assets/s4.jpg";
+import Service4Image from "@/assets/s4.png";
 import servicesImage from "@/assets/services-icons.jpg";
 import productsImage from "@/assets/products-display.jpg";
 import Layout from "@/components/layout/Layout";
@@ -66,8 +70,6 @@ const testimonials = [
 
 const stats = [
   { value: "10+", label: "Années d'expérience" },
-  { value: "5000+", label: "Patients suivis" },
-  { value: "15", label: "Spécialistes" },
   { value: "98%", label: "Satisfaction patient" },
 ];
 const productPillars = [
@@ -107,95 +109,220 @@ export default function Home() {
     <div>
       {/* Hero Section */}
       <section className="medical-hero">
-        <div className="medical-container relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Votre santé,{" "}
-                <span className="text-gradient-primary">notre priorité</span>
-              </h1>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                Découvrez une approche moderne et humaine de la médecine avec notre équipe
-                de spécialistes dédiés à votre bien-être et votre santé.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <MedicalButton variant="primary" size="lg" asChild>
-                  <Link to="/contact">
-                    Prendre rendez-vous
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </MedicalButton>
-                <MedicalButton variant="outline" size="lg" asChild>
-                  <Link to="/services">Nos services</Link>
-                </MedicalButton>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <img
-                src={heroImage}
-                alt="Établissement médical moderne avec équipe soignante"
-                className="w-full h-[500px] object-cover rounded-2xl shadow-medical-xl"
-              />
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent"></div>
-            </div>
-          </div>
+  <div className="medical-container relative z-10">
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+          Bastide Le Confort Médical,{" "}
+          <span className="text-gradient-primary">1er réseau de matériel médical en Tunisie</span>
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+          Spécialisée dans la vente et la location de matériel médical, Bastide Le Confort Médical
+          accompagne particuliers et professionnels pour favoriser l’autonomie, la mobilité et
+          le bien-être au quotidien.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <MedicalButton variant="primary" size="lg" asChild>
+            <Link to="/contact">
+              Prendre rendez-vous
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </MedicalButton>
+          <MedicalButton variant="outline" size="lg" asChild>
+            <Link to="/services">Nos services</Link>
+          </MedicalButton>
         </div>
-      </section>
+      </div>
 
-      {/* Stats Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="medical-container">
-          <div className="medical-grid medical-grid--4">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-4xl font-bold text-medical-primary mb-2">
-                  {stat.value}
-                </div>
-                <div className="text-gray-600 font-medium">{stat.label}</div>
-              </div>
-            ))}
+      <div className="relative">
+        <img
+          src={heroImage}
+          alt="Établissement médical moderne avec équipe soignante"
+          className="w-full h-[500px] object-cover rounded-2xl shadow-medical-xl"
+        />
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Nouvelle section Bastide - Détails */}
+<section className="py-20 bg-white">
+  <div className="medical-container max-w-5xl mx-auto text-center">
+    <h2 className="text-4xl font-bold text-gray-900 mb-8">
+      Vente et location de matériel médical à domicile
+    </h2>
+    <p className="text-lg text-gray-700 leading-relaxed mb-6">
+      Bastide Le Confort Médical propose plus de 2 000 références de matériel paramédical,
+      orthopédique et d’équipement médical pour améliorer le confort, le bien-être et le maintien
+      à domicile des personnes âgées, en situation de handicap ou en convalescence.
+    </p>
+
+    <div className="grid md:grid-cols-2 gap-10 text-left mt-10">
+      <div>
+        <h3 className="text-2xl font-semibold text-medical-primary mb-3">
+          Guide pratique & conseils
+        </h3>
+        <p className="text-gray-700 leading-relaxed">
+          Découvrez nos astuces pour aménager efficacement le logement et améliorer
+          le confort des personnes âgées ou à mobilité réduite. Nos fauteuils releveurs,
+          solutions de mobilité et aménagements de salle de bain favorisent l’autonomie
+          et la sécurité au quotidien.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-2xl font-semibold text-medical-primary mb-3">
+          Solutions pour le handicap
+        </h3>
+        <p className="text-gray-700 leading-relaxed">
+          Qu’il s’agisse d’une perte d’autonomie temporaire ou durable, nos experts sélectionnent
+          les aides techniques les plus adaptées. Prenez rendez-vous avec un conseiller Bastide
+          proche de chez vous pour un accompagnement personnalisé.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-2xl font-semibold text-medical-primary mb-3">
+          Incontinence : bien choisir sa protection
+        </h3>
+        <p className="text-gray-700 leading-relaxed">
+          Il existe différents types de protections adultes selon le degré d’autonomie.
+          Découvrez nos conseils pour choisir la solution la plus adaptée à vos besoins.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-2xl font-semibold text-medical-primary mb-3">
+          Espace professionnel
+        </h3>
+        <p className="text-gray-700 leading-relaxed">
+          Professionnels de santé ? Retrouvez tout le matériel nécessaire pour vos soins,
+          diagnostics, hygiène et mobilier médical. Profitez de -10 % toute l’année sur
+          notre matériel médical professionnel.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{/* Section Stats existante */}
+<section className="py-16 bg-gray-50">
+  <div className="medical-container">
+    <div className="medical-grid medical-grid--4">
+      {stats.map((stat, index) => (
+        <div key={index} className="text-center">
+          <div className="text-4xl font-bold text-medical-primary mb-2">
+            {stat.value}
           </div>
+          <div className="text-gray-600 font-medium">{stat.label}</div>
         </div>
-      </section>
+      ))}
+    </div>
+  </div>
+</section>
+
 
       {/* Services Section */}
-      <section className="medical-section">
-        <div className="medical-container">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Nos services médicaux
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Une gamme complète de services médicaux pour répondre à tous vos besoins de santé,
-              avec une approche personnalisée et bienveillante.
-            </p>
-          </div>
+      <section className="py-20 bg-gray-50">
+  <div className="medical-container">
+    <div className="text-center mb-12">
+      <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        Les services Bastide
+      </h2>
+      <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+        Découvrez nos principaux services pour vous accompagner au quotidien,
+        que ce soit à domicile, en magasin ou à distance.
+      </p>
+    </div>
 
-          <div className="medical-grid medical-grid--3 mb-12">
-            {services.map((service, index) => (
-              <MedicalCard key={index}>
-                <MedicalCard.Content>
-                  <div className="w-12 h-12 bg-gradient-primary rounded-lg flex items-center justify-center mb-4">
-                    <service.icon className="h-6 w-6 text-white" />
-                  </div>
-                  <MedicalCard.Title>{service.title}</MedicalCard.Title>
-                  <MedicalCard.Description>{service.description}</MedicalCard.Description>
-                </MedicalCard.Content>
-              </MedicalCard>
-            ))}
-          </div>
-
-          <div className="text-center">
-            <MedicalButton variant="primary" asChild>
-              <Link to="/services">
-                Découvrir tous nos services
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </MedicalButton>
-          </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {/* Service 1 */}
+      <div className="relative group rounded-2xl overflow-hidden shadow-md">
+        <img
+          src={Service1Image}
+          alt="Location de matériel médical"
+          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+        />
+        <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
+          <h3 className="text-lg font-semibold mb-3">
+            Location de matériel médical
+          </h3>
+          <Link
+            to="/location-materiel"
+            className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
+          >
+            Découvrir
+          </Link>
         </div>
-      </section>
+      </div>
+
+      {/* Service 2 */}
+      <div className="relative group rounded-2xl overflow-hidden shadow-md">
+        <img
+          src={Service2Image}
+          alt="Maintien à domicile"
+          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+        />
+        <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
+          <h3 className="text-lg font-semibold mb-3">
+            Nos experts du maintien à domicile vous accompagnent pour une prise en charge globale
+          </h3>
+          <Link
+            to="/contact"
+            className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
+          >
+            Être rappelé
+          </Link>
+        </div>
+      </div>
+
+      {/* Service 3 */}
+      <div className="relative group rounded-2xl overflow-hidden shadow-md">
+        <img
+          src={Service4Image}
+          alt="Réseau Bastide"
+          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+        />
+        <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
+        <h3 className="text-lg font-semibold mb-3">
+          Votre boutique de confiance en Tunisie avec 2 magasins à votre service
+        </h3>
+        <Link
+          to="/magasins"
+          className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
+        >
+          Trouver mon magasin
+        </Link>
+      </div>
+
+      </div>
+
+      {/* Service 4 */}
+      <div className="relative group rounded-2xl overflow-hidden shadow-md">
+        <img
+          src={Service3Image}
+          alt="Service client Bastide"
+          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+        />
+        <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
+          <h3 className="text-lg font-semibold mb-3">
+            Une question ? Appelez notre service client au <br />
+            <span className="font-bold">29 380 898</span> <br />
+            
+          </h3>
+          <a
+            href="tel:+21629380898"
+            className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
+          >
+            29 380 898
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Features Section */}
       <section className="medical-section bg-gray-50">
