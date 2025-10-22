@@ -83,12 +83,13 @@ export default function ModifierProduit() {
     }
 
     const formData = new FormData();
+    formData.append("_method", "PATCH");
     formData.append("titre", titre);
     formData.append("reference", reference);
     formData.append("description_html", description);
     formData.append("categorie_id", categorieId);
     formData.append("prix", prix);
-    formData.append("est_actif", String(estActif));
+    formData.append("est_actif", estActif ? "true" : "false");
     formData.append("galerie_json", JSON.stringify(gallery));
 
     if (newMiniature) formData.append("image_miniature", newMiniature);
@@ -96,9 +97,10 @@ export default function ModifierProduit() {
 
     try {
       await fetchWithAuth(`/crud/products/${id}`, {
-        method: "POST",
+        method: "POST", // ← on envoie POST + _method=PATCH
         body: formData,
       });
+      
       setSuccess(true);
       setTimeout(() => navigate("/dashboard/produits"), 2000);
     } catch (err) {
