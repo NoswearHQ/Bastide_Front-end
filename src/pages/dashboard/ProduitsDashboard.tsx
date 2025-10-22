@@ -182,7 +182,7 @@ export default function ProduitsDashboard() {
   <div className="w-16 h-16 bg-gray-100 flex items-center justify-center rounded overflow-hidden border">
     <img
       src={imageUrl(p.image_miniature)}
-      alt={p.titre}
+      
       className={`w-full h-full object-cover ${
         p.image_miniature?.includes("bastidelogo.png") ? "object-contain p-3" : ""
       }`}

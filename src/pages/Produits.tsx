@@ -423,22 +423,21 @@ const handlePageChange = (page: number) => {
 )}
 
         </div>
-        <div className="flex items-center space-x-2 mt-2">
-          <div className="flex">{renderStars(4)}</div>
-          <span className="text-sm text-gray-500">(— avis)</span>
-        </div>
+        
       </div>
 
       {/* Row 3: zone variable poussée en 1fr (description + éventuelles features) */}
       <div className="min-h-0">
-        {product.description && (
-          <MedicalCard.Description className="clamp-5 line-clamp-5">
-            {product.description}
-          </MedicalCard.Description>
-        )}
+  {product.description && (
+    <MedicalCard.Description className="clamp-5 line-clamp-5">
+      <div
+        className="prose prose-sm max-w-none"
+        dangerouslySetInnerHTML={{ __html: product.description }}
+      />
+    </MedicalCard.Description>
+  )}
+</div>
 
-        
-      </div>
 
       {/* Row 4: boutons — toujours alignés en bas grâce à la 1fr au-dessus */}
       <div className="mt-2 flex gap-2 items-center">
@@ -555,7 +554,6 @@ const handlePageChange = (page: number) => {
 function ProductDetailsView({ product }: { product: ProductDetail }) {
   const gallery = useMemo(() => {
     const list: string[] = [];
-    console.log(product)
 
     if (product.image_miniature) list.push(imageUrl(product.image_miniature));
 
@@ -573,12 +571,8 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
       ? `${product.prix}${product.devise === "EUR" ? "€" : product.devise ? ` ${product.devise}` : ""}`
       : "—";
 
-  const description =
-    product.description_courte ||
-    product.seo_description ||
-    (product.description_html
-      ? (new DOMParser().parseFromString(product.description_html, "text/html").body.textContent || "")
-      : "");
+  // 👉 garde le HTML tel quel
+  const description = product.description_html || "";
 
   return (
     <div className="text-left">
@@ -618,8 +612,13 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
         )}
       </div>
 
-      {/* Description */}
-      {description && <p className="text-gray-700 leading-relaxed mb-4">{description}</p>}
+      {/* ✅ Description avec HTML interprété */}
+      {description && (
+        <div
+          className="text-gray-700 leading-relaxed mb-4 prose prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: description }}
+        />
+      )}
 
       {/* Métadonnées rapides */}
       <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
@@ -629,26 +628,26 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
 
       {/* Actions */}
       <div className="mt-6 flex gap-2">
-  <MedicalButton
-    variant="primary"
-    size="sm"
-    className="flex-1"
-    onClick={() => {
-      const phone = "+21629785570";
-      const message = encodeURIComponent(
-        `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.titre}\n\nMerci de me confirmer la disponibilité.`
-      );
-      window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
-    }}
-  >
-    <ShoppingCart className="mr-2 h-4 w-4" />
-    Commander
-  </MedicalButton>
-</div>
-
+        <MedicalButton
+          variant="primary"
+          size="sm"
+          className="flex-1"
+          onClick={() => {
+            const phone = "+21629785570";
+            const message = encodeURIComponent(
+              `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.titre}\n\nMerci de me confirmer la disponibilité.`
+            );
+            window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
+          }}
+        >
+          <ShoppingCart className="mr-2 h-4 w-4" />
+          Commander
+        </MedicalButton>
+      </div>
     </div>
   );
 }
+
 
 
 
