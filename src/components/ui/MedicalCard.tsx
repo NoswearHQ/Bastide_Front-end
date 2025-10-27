@@ -33,6 +33,11 @@ interface MedicalCardDescriptionProps {
   className?: string;
 }
 
+interface MedicalCardHeaderProps {
+  children: ReactNode;
+  className?: string;
+}
+
 function MedicalCard({ children, className, hover = true }: MedicalCardProps) {
   return (
     <div className={cn("medical-card", !hover && "hover:shadow-lg hover:translate-y-0", className)}>
@@ -83,11 +88,20 @@ function MedicalCardDescription({ children, className }: MedicalCardDescriptionP
   );
 }
 
+function MedicalCardHeader({ children, className }: MedicalCardHeaderProps) {
+  return (
+    <div className={cn("medical-card__header", className)}>
+      {children}
+    </div>
+  );
+}
+
 // Compound component pattern
 MedicalCard.Media = MedicalCardMedia;
 MedicalCard.Content = MedicalCardContent;
 MedicalCard.Title = MedicalCardTitle;
 MedicalCard.Meta = MedicalCardMeta;
 MedicalCard.Description = MedicalCardDescription;
+MedicalCard.Header = MedicalCardHeader;
 
 export { MedicalCard };

@@ -3,22 +3,19 @@ import { MapPin, Phone, Mail, Clock, Facebook, Twitter, Linkedin, Instagram } fr
 
 const footerNavigation = {
   services: [
-    { name: "Consultations", href: "/services" },
+    { name: "Location de matériel médical", href: "/location-materiel" },
     { name: "Examens médicaux", href: "/services" },
     { name: "Prévention", href: "/services" },
     { name: "Urgences", href: "/services" },
   ],
   produits: [
     { name: "Matériel médical", href: "/produits" },
-    { name: "Équipements", href: "/produits" },
-    { name: "Dispositifs", href: "/produits" },
-    { name: "Consommables", href: "/produits" },
   ],
   legal: [
-    { name: "Mentions légales", href: "#" },
-    { name: "Politique de confidentialité", href: "#" },
-    { name: "Conditions d'utilisation", href: "#" },
-    { name: "Cookies", href: "#" },
+    { name: "Mentions légales", href: "/mentions-legales" },
+    { name: "Politique de confidentialité", href: "/politique-confidentialite" },
+    { name: "Conditions d'utilisation", href: "/conditions-utilisation" },
+    { name: "Cookies", href: "/cookies" },
   ],
 };
 
@@ -155,11 +152,9 @@ export default function Footer() {
         <div className="border-t border-gray-700 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left">
             <p className="text-gray-400 text-sm">
-              © 2024 MedicalCare. Tous droits réservés.
+              © 2024 Bastide Tunisie
             </p>
-            <p className="text-gray-400 text-sm mt-2 md:mt-0">
-              Établissement de santé agréé • FINESS: 123456789
-            </p>
+            
           </div>
         </div>
       </div>

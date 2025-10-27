@@ -12,6 +12,11 @@ import Produits from "./pages/Produits";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import LocationMaterielMedical from "./pages/LocationMaterielMedical";
+import CatalogueCalameo from "./pages/CatalogueCalameo";
+import MentionsLegales from "./pages/MentionsLegales";
+import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
+import ConditionsUtilisation from "./pages/ConditionsUtilisation";
+import Cookies from "./pages/Cookies";
 import NotFound from "./pages/NotFound";
 import Articles from "./pages/dashboard/ArticlesDashboard";
 // 🔒 import des nouveaux éléments
@@ -21,6 +26,10 @@ import Login from "./pages/Auth/Login";
 import ProduitsDashboard from "./pages/dashboard/ProduitsDashboard";
 import AjouterProduit from "./pages/dashboard/AjouterProduit";
 import ModifierProduit from "./pages/dashboard/ModifierProduit";
+import ArticlesAdmin from "./pages/dashboard/ArticlesAdmin";
+import ArticleCreate from "./pages/dashboard/ArticleCreate";
+import ArticleEdit from "./pages/dashboard/ArticleEdit";
+import ArticleDetail from "./pages/ArticleDetail";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +47,12 @@ const App = () => (
           <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/location-materiel" element={<LocationMaterielMedical />} />
+          <Route path="/catalogue" element={<CatalogueCalameo />} />
+          <Route path="/mentions-legales" element={<MentionsLegales />} />
+          <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+          <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
+          <Route path="/cookies" element={<Cookies />} />
+          <Route path="/articles/:slug" element={<ArticleDetail />} />
           <Route
   path="/dashboard"
   element={
@@ -51,7 +66,7 @@ const App = () => (
   path="/dashboard/articles"
   element={
     <PrivateRoute>
-      <Articles />
+      <ArticlesAdmin />
     </PrivateRoute>
   }
 />
@@ -97,6 +112,30 @@ const App = () => (
   element={
     <PrivateRoute>
       <ModifierProduit />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/dashboard/articles"
+  element={
+    <PrivateRoute>
+      <ArticlesAdmin />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/dashboard/articles/create"
+  element={
+    <PrivateRoute>
+      <ArticleCreate />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/dashboard/articles/edit/:id"
+  element={
+    <PrivateRoute>
+      <ArticleEdit />
     </PrivateRoute>
   }
 />
