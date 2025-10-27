@@ -1,5 +1,5 @@
 // src/pages/Auth/Login.tsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import { MedicalButton } from "@/components/ui/medical-button";
@@ -8,12 +8,32 @@ import { Lock, Mail } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Don't render the form if user is already authenticated (while redirecting)
+  if (isAuthenticated) {
+    return (
+      <Layout>
+        <section className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="text-gray-600">Redirection vers le tableau de bord...</div>
+          </div>
+        </section>
+      </Layout>
+    );
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +41,7 @@ export default function Login() {
     setError(null);
     try {
       await login(email, password);
-      navigate("/"); // redirige vers accueil
+      navigate("/dashboard"); // redirect to dashboard after successful login
     } catch {
       setError("Email ou mot de passe incorrect.");
     } finally {
@@ -87,12 +107,7 @@ export default function Login() {
             </MedicalButton>
           </form>
 
-          <p className="text-center text-sm text-gray-600 mt-4">
-            Pas encore de compte ?{" "}
-            <a href="/register" className="text-medical-primary hover:underline">
-              Créez-en un
-            </a>
-          </p>
+          
         </div>
       </section>
     </Layout>

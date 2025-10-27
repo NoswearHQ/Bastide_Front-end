@@ -117,13 +117,34 @@ export type Article = {
   id: string;
   titre: string;
   slug: string;
+  nom_auteur?: string | null;
   image_miniature?: string | null;
+  galerie_json?: string | null;
   extrait?: string | null;
+  contenu_html: string;
+  statut: string;
+  publie_le?: string | null;
   seo_titre?: string | null;
   seo_description?: string | null;
-  publie_le?: string | null;
-  contenu_html?: string | null;
+  cree_le: string;
+  modifie_le: string;
 };
+
+export type ArticleCreate = {
+  titre: string;
+  slug: string;
+  nom_auteur?: string;
+  image_miniature?: string;
+  galerie_json?: string;
+  extrait?: string;
+  contenu_html: string;
+  statut: string;
+  publie_le?: string;
+  seo_titre?: string;
+  seo_description?: string;
+};
+
+export type ArticleUpdate = Partial<ArticleCreate>;
 
 export async function apiLogin(email: string, password: string) {
   const res = await fetchJson<{ token: string; refreshToken: string }>(`${API_BASE}/auth/login`, {
@@ -282,4 +303,41 @@ export async function patchCategory(
 // 🔹 Suppression (protégée)
 export async function deleteCategory(id: number) {
   return fetchWithAuth<void>(`/crud/categories/${id}`, { method: "DELETE" });
+}
+
+// ---------- Endpoints CRUD Articles ----------
+
+// 🔹 Récupération d'un article par ID (publique)
+export async function getArticleById(id: string | number): Promise<Article> {
+  return fetchPublic<Article>(`/crud/articles/${id}`);
+}
+
+// 🔹 Récupération d'un article par slug (publique)
+export async function getArticleBySlug(slug: string): Promise<Article> {
+  const articles = await fetchPublic<Paginated<Article>>(`/crud/articles?search=${encodeURIComponent(slug)}&limit=1`);
+  if (articles.rows.length === 0) {
+    throw new Error('Article not found');
+  }
+  return articles.rows[0];
+}
+
+// 🔹 Création d'un article (protégée)
+export async function createArticle(payload: ArticleCreate) {
+  return fetchWithAuth<{ id: string }>(`/crud/articles`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+// 🔹 Mise à jour d'un article (protégée)
+export async function updateArticle(id: string | number, payload: ArticleUpdate) {
+  return fetchWithAuth<{ ok: true }>(`/crud/articles/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
+// 🔹 Suppression d'un article (protégée)
+export async function deleteArticle(id: string | number) {
+  return fetchWithAuth<void>(`/crud/articles/${id}`, { method: "DELETE" });
 }

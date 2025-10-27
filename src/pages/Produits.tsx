@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Search, Filter, Star, ShoppingCart, Info } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
@@ -103,7 +103,7 @@ export default function Produits() {
 
   // UI state
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCatId, setSelectedCatId] = useState<string>("ALL");
+  const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState("name");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -113,12 +113,41 @@ export default function Produits() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [searching, setSearching] = useState(false);
+  
+  // Grouped products for display when no category selected
+  const [groupedProducts, setGroupedProducts] = useState<Record<string, UiProduct[]>>({});
+  
+  // Cache for categories to avoid repeated API calls
+  const [categoriesCache, setCategoriesCache] = useState<Record<string, UiProduct[]>>({});
+  const [loadedCategories, setLoadedCategories] = useState<Set<string>>(new Set());
+  const [loadingMoreCategories, setLoadingMoreCategories] = useState(false);
 
   // Catégories dynamiques depuis le back
   const [catOptions, setCatOptions] = useState<CatOption[]>([]);
   const [catMap, setCatMap] = useState<Map<string, string>>(new Map());
 
   const productsPerPage = 6;
+
+  // Debounced search to improve performance
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  // Show searching indicator when search term changes
+  useEffect(() => {
+    if (searchTerm !== debouncedSearchTerm) {
+      setSearching(true);
+    } else {
+      setSearching(false);
+    }
+  }, [searchTerm, debouncedSearchTerm]);
 
   // tri UI -> param back
   const orderParam = useMemo(() => {
@@ -161,14 +190,15 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, []);
 
-// ✅ Hydrater l’état depuis l’URL (TOP-LEVEL, pas imbriqué !)
+// ✅ Hydrater l'état depuis l'URL (TOP-LEVEL, pas imbriqué !)
 useEffect(() => {
-  const cat = params.get("categoryId") ?? "ALL";
+  const catParam = params.get("categoryId");
+  const cats = catParam ? catParam.split(',').filter(Boolean) : [];
   const sort = params.get("sort") ?? "name";
   const qParam = params.get("q") ?? "";
   const p = Number(params.get("page") || 1);
 
-  setSelectedCatId((prev) => (prev !== cat ? cat : prev));
+  setSelectedCatIds((prev) => (JSON.stringify(prev) !== JSON.stringify(cats) ? cats : prev));
   setSortBy((prev) => (prev !== sort ? sort : prev));
   setSearchTerm((prev) => (prev !== qParam ? qParam : prev));
   setCurrentPage((prev) => (prev !== p ? p : prev));
@@ -176,53 +206,156 @@ useEffect(() => {
 
 // Charger les produits selon critères
 useEffect(() => {
-  const query: ProductQuery = {
-    search: searchTerm || undefined,
-    page: currentPage,
-    limit: productsPerPage,
-    order: orderParam,
-    categoryId: selectedCatId !== "ALL" ? selectedCatId : undefined,
-  };
-
   setLoading(true);
   setError(null);
 
-  getProducts(query)
-    .then((res) => {
-      const rawList = (res.rows as Product[]) || [];
-      const ui = rawList.map((p) => {
-        const base = toUiProduct(p);
-        const desc = base.description ?? makeDescriptionFromRaw(p);
-        return {
-          ...base,
-          category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
-          description: desc,
-        } as UiProduct & { description?: string };
-      });
+  if (selectedCatIds.length > 0) {
+    // Mode filtrage: afficher les produits des catégories sélectionnées
+    const query: ProductQuery = {
+      search: debouncedSearchTerm || undefined,
+      page: currentPage,
+      limit: productsPerPage,
+      order: orderParam,
+      categoryId: selectedCatIds[0], // Pour l'instant, on prend la première catégorie
+    };
 
-      const idx: Record<string, Product> = {};
-      rawList.forEach((p) => (idx[String(p.id)] = p));
+    getProducts(query)
+      .then((res) => {
+        const rawList = (res.rows as Product[]) || [];
+        const ui = rawList.map((p) => {
+          const base = toUiProduct(p);
+          const desc = base.description ?? makeDescriptionFromRaw(p);
+          return {
+            ...base,
+            category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+            description: desc,
+          } as UiProduct & { description?: string };
+        });
 
-      setRows(ui);
-      setRawById(idx);
-      setTotal(res.total);
-    })
-    .catch((e) => setError(String(e?.message || e)))
-    .finally(() => setLoading(false));
-}, [searchTerm, currentPage, orderParam, selectedCatId, catMap]);
+        const idx: Record<string, Product> = {};
+        rawList.forEach((p) => (idx[String(p.id)] = p));
+
+        setRows(ui);
+        setRawById(idx);
+        setTotal(res.total);
+        setGroupedProducts({});
+      })
+      .catch((e) => setError(String(e?.message || e)))
+      .finally(() => setLoading(false));
+  } else {
+    // Mode groupé: afficher 3 produits par catégorie
+    // MAIS si on recherche, utiliser une seule requête globale
+    if (debouncedSearchTerm) {
+      // Recherche globale sans filtre de catégorie
+      const query: ProductQuery = {
+        search: debouncedSearchTerm,
+        page: 1,
+        limit: 50, // Limite plus élevée pour la recherche
+        order: orderParam,
+      };
+
+      getProducts(query)
+        .then((res) => {
+          const rawList = (res.rows as Product[]) || [];
+          const ui = rawList.map((p) => {
+            const base = toUiProduct(p);
+            const desc = base.description ?? makeDescriptionFromRaw(p);
+            return {
+              ...base,
+              category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+              description: desc,
+            } as UiProduct & { description?: string };
+          });
+
+          const idx: Record<string, Product> = {};
+          rawList.forEach((p) => (idx[String(p.id)] = p));
+
+          setRows(ui);
+          setRawById(idx);
+          setTotal(res.total);
+          setGroupedProducts({});
+        })
+        .catch((e) => setError(String(e?.message || e)))
+        .finally(() => setLoading(false));
+    } else {
+      // Mode groupé normal (sans recherche) - Lazy loading optimisé
+      const loadGroupedProducts = async () => {
+        try {
+          const grouped: Record<string, UiProduct[]> = {};
+          const allRaw: Record<string, Product> = {};
+          
+          // Charger seulement les 3 premières catégories initialement
+          const categoriesToLoad = catOptions
+            .filter(opt => opt.id !== "ALL")
+            .slice(0, 3); // Limite à 3 catégories pour le chargement initial
+          
+          // Charger les produits pour les catégories sélectionnées
+          for (const catOption of categoriesToLoad) {
+            // Vérifier le cache d'abord
+            if (categoriesCache[catOption.id]) {
+              grouped[catOption.id] = categoriesCache[catOption.id];
+              continue;
+            }
+            
+            const query: ProductQuery = {
+              page: 1,
+              limit: 3,
+              order: orderParam,
+              categoryId: catOption.id,
+            };
+
+            const res = await getProducts(query);
+            const rawList = (res.rows as Product[]) || [];
+            
+            if (rawList.length > 0) {
+              const ui = rawList.map((p) => {
+                const base = toUiProduct(p);
+                const desc = base.description ?? makeDescriptionFromRaw(p);
+                allRaw[String(p.id)] = p;
+                return {
+                  ...base,
+                  category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+                  description: desc,
+                } as UiProduct & { description?: string };
+              });
+              
+              grouped[catOption.id] = ui;
+              // Mettre en cache
+              setCategoriesCache(prev => ({ ...prev, [catOption.id]: ui }));
+              setLoadedCategories(prev => new Set([...prev, catOption.id]));
+            }
+          }
+
+          setGroupedProducts(grouped);
+          setRawById(allRaw);
+          setRows([]);
+          setTotal(Object.values(grouped).reduce((sum, products) => sum + products.length, 0));
+        } catch (e) {
+          setError(String(e?.message || e));
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      loadGroupedProducts();
+    }
+  }
+}, [debouncedSearchTerm, currentPage, orderParam, selectedCatIds, catMap, catOptions]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(total / productsPerPage)),
     [total, productsPerPage]
   );
 // ✅ AJOUTE ICI LA MÉTHODE updateUrl
-function updateUrl(partial: { categoryId?: string; sort?: string; q?: string; page?: number }) {
+function updateUrl(partial: { categoryIds?: string[]; sort?: string; q?: string; page?: number }) {
   const next = new URLSearchParams(params);
 
-  if (partial.categoryId !== undefined) {
-    partial.categoryId === "ALL"
-      ? next.delete("categoryId")
-      : next.set("categoryId", partial.categoryId);
+  if (partial.categoryIds !== undefined) {
+    if (partial.categoryIds.length === 0) {
+      next.delete("categoryId");
+    } else {
+      next.set("categoryId", partial.categoryIds.join(','));
+    }
     next.delete("page");
   }
 
@@ -243,10 +376,22 @@ function updateUrl(partial: { categoryId?: string; sort?: string; q?: string; pa
   setParams(next, { replace: true });
 }
 
-const handleCategoryChange = (value: string) => {
-  setSelectedCatId(value);
+const handleCategoryToggle = (categoryId: string) => {
+  setSelectedCatIds(prev => {
+    const newIds = prev.includes(categoryId) 
+      ? prev.filter(id => id !== categoryId)
+      : [...prev, categoryId];
+    setCurrentPage(1);
+    updateUrl({ categoryIds: newIds });
+    return newIds;
+  });
+};
+
+const handleCategorySelect = (categoryId: string) => {
+  setSelectedCatIds([categoryId]);
   setCurrentPage(1);
-  updateUrl({ categoryId: value });
+  updateUrl({ categoryIds: [categoryId] });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const handleSortChange = (sort: string) => {
@@ -265,6 +410,67 @@ const handlePageChange = (page: number) => {
   setCurrentPage(page);
   updateUrl({ page });
   window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const loadMoreCategories = async () => {
+  if (loadingMoreCategories) return;
+  
+  setLoadingMoreCategories(true);
+  try {
+    const remainingCategories = catOptions
+      .filter(opt => opt.id !== "ALL" && !loadedCategories.has(opt.id))
+      .slice(0, 3); // Charger 3 catégories supplémentaires
+    
+    const newGrouped: Record<string, UiProduct[]> = {};
+    const allRaw: Record<string, Product> = {};
+    
+    for (const catOption of remainingCategories) {
+      const query: ProductQuery = {
+        page: 1,
+        limit: 3,
+        order: orderParam,
+        categoryId: catOption.id,
+      };
+
+      const res = await getProducts(query);
+      const rawList = (res.rows as Product[]) || [];
+      
+      if (rawList.length > 0) {
+        const ui = rawList.map((p) => {
+          const base = toUiProduct(p);
+          const desc = base.description ?? makeDescriptionFromRaw(p);
+          allRaw[String(p.id)] = p;
+          return {
+            ...base,
+            category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+            description: desc,
+          } as UiProduct & { description?: string };
+        });
+        
+        newGrouped[catOption.id] = ui;
+        setCategoriesCache(prev => ({ ...prev, [catOption.id]: ui }));
+        setLoadedCategories(prev => new Set([...prev, catOption.id]));
+      }
+    }
+    
+    // Mettre à jour les produits groupés - s'assurer que les nouvelles catégories sont ajoutées à la fin
+    setGroupedProducts(prev => {
+      const updated = { ...prev };
+      // Ajouter les nouvelles catégories dans l'ordre des catOptions
+      for (const catOption of remainingCategories) {
+        if (newGrouped[catOption.id]) {
+          updated[catOption.id] = newGrouped[catOption.id];
+        }
+      }
+      return updated;
+    });
+    setRawById(prev => ({ ...prev, ...allRaw }));
+    setTotal(prev => prev + Object.values(newGrouped).reduce((sum, products) => sum + products.length, 0));
+  } catch (e) {
+    setError(String(e?.message || e));
+  } finally {
+    setLoadingMoreCategories(false);
+  }
 };
 
 
@@ -295,34 +501,35 @@ const handlePageChange = (page: number) => {
       {/* Filters Section */}
       <section className="py-8 bg-gray-50 border-b">
         <div className="medical-container">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Search */}
             <div className="lg:col-span-2">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 ${searching ? 'text-medical-primary animate-pulse' : 'text-gray-400'}`} />
                 <input
                   type="text"
-                  placeholder="Rechercher un produit..."
+                  placeholder="Rechercher par titre, catégorie ou référence..."
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
                   className="medical-form-input pl-10"
                 />
+                {searching && (
+                  <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-medical-primary"></div>
+                  </div>
+                )}
               </div>
-            </div>
-
-            {/* Category Filter (dynamique depuis le back) */}
-            <div>
-              <select
-                value={selectedCatId}
-                onChange={(e) => handleCategoryChange(e.target.value)}
-                className="medical-form-select"
-              >
-                {catOptions.map((opt) => (
-                  <option key={opt.id} value={opt.id}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
+              <div className="mt-1">
+                <p className="text-xs text-gray-500">
+                  Recherchez par nom de produit, catégorie ou référence
+                </p>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  <span className="text-xs text-gray-400">Exemples:</span>
+                  <span className="text-xs text-gray-400">"stéthoscope"</span>
+                  <span className="text-xs text-gray-400">"chirurgie"</span>
+                  <span className="text-xs text-gray-400">"REF-001"</span>
+                </div>
+              </div>
             </div>
 
             {/* Sort */}
@@ -341,16 +548,39 @@ const handlePageChange = (page: number) => {
             </div>
           </div>
 
+          {/* Category Pills */}
+          <div className="mt-6">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Catégories</h3>
+            <div className="flex flex-wrap gap-2">
+              {catOptions.filter(opt => opt.id !== "ALL").map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => handleCategoryToggle(option.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                    selectedCatIds.includes(option.id)
+                      ? "bg-medical-primary text-white shadow-md"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* Active Filters */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {selectedCatId !== "ALL" && (
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-medical-primary text-white">
-                {catMap.get(selectedCatId) || "Catégorie"}
-                <button onClick={() => handleCategoryChange("ALL")} className="ml-2 hover:text-gray-200">
+            {selectedCatIds.map((catId) => (
+              <span key={catId} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-medical-primary text-white">
+                {catMap.get(catId) || "Catégorie"}
+                <button 
+                  onClick={() => handleCategoryToggle(catId)} 
+                  className="ml-2 hover:text-gray-200"
+                >
                   ×
                 </button>
               </span>
-            )}
+            ))}
             {searchTerm && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">
                 "{searchTerm}"
@@ -370,16 +600,23 @@ const handlePageChange = (page: number) => {
             <p className="text-gray-500">Chargement…</p>
           ) : error ? (
             <div className="text-red-600">Erreur : {error}</div>
-          ) : rows.length > 0 ? (
-            <>
-              {/* Results Count */}
-              <div className="mb-8">
-                <p className="text-gray-600">
-                  {total} produit{total > 1 ? "s" : ""} trouvé{total > 1 ? "s" : ""}
-                </p>
-              </div>
+          ) : selectedCatIds.length > 0 || (debouncedSearchTerm && rows.length > 0) ? (
+            // Mode filtrage: affichage normal avec pagination
+            rows.length > 0 ? (
+              <>
+                {/* Results Count */}
+                <div className="mb-8">
+                  <p className="text-gray-600">
+                    {total} produit{total > 1 ? "s" : ""} trouvé{total > 1 ? "s" : ""}
+                    {searchTerm && (
+                      <span className="text-gray-500">
+                        {" "}pour "{searchTerm}"
+                      </span>
+                    )}
+                  </p>
+                </div>
 
-              <div className="medical-grid medical-grid--3">
+                <div className="medical-grid medical-grid--3">
               {rows.map((product) => {
   const description = product.description ?? "";       // safe
 
@@ -495,13 +732,175 @@ const handlePageChange = (page: number) => {
               <MedicalButton
                 variant="primary"
                 onClick={() => {
-                  setSelectedCatId("ALL");
+                  setSelectedCatIds([]);
                   setSearchTerm("");
                 }}
               >
                 Réinitialiser les filtres
               </MedicalButton>
             </div>
+          )
+          ) : (
+            // Mode groupé: affichage par catégories
+            Object.keys(groupedProducts).length > 0 ? (
+              <>
+                {/* Results Count */}
+                <div className="mb-8">
+                  <p className="text-gray-600">
+                    {total} produit{total > 1 ? "s" : ""} trouvé{total > 1 ? "s" : ""}
+                    {searchTerm && (
+                      <span className="text-gray-500">
+                        {" "}pour "{searchTerm}"
+                      </span>
+                    )}
+                  </p>
+                </div>
+
+                {/* Grouped Products by Category - Display in correct order */}
+                {catOptions
+                  .filter(opt => opt.id !== "ALL" && groupedProducts[opt.id])
+                  .map((catOption) => {
+                    const categoryId = catOption.id;
+                    const products = groupedProducts[categoryId];
+                    return (
+                  <div key={categoryId} className="mb-12">
+                    <div className="flex items-center justify-between mb-6">
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {catMap.get(categoryId) || "Catégorie"}
+                      </h2>
+                      <MedicalButton
+                        variant="outline"
+                        onClick={() => handleCategorySelect(categoryId)}
+                      >
+                        Voir plus
+                      </MedicalButton>
+                    </div>
+                    
+                    <div className="medical-grid medical-grid--3">
+                      {products.map((product) => {
+                        const description = product.description ?? "";
+
+                        return (
+                          <MedicalCard key={product.id} className="h-full flex flex-col">
+                            <div className="relative">
+                              <div className="aspect-square bg-gray-200 rounded-t-xl flex items-center justify-center overflow-hidden">
+                                <img
+                                  src={safeProductImage(product.image ?? product.image)}
+                                  alt={product.name}
+                                  className={`w-full max-w-[300px] h-auto ${
+                                    product.image?.includes("bastidelogo.png")
+                                      ? "object-contain p-6"
+                                      : "object-cover"
+                                  }`}
+                                  loading="lazy"
+                                />
+                              </div>
+                            </div>
+
+                            <MedicalCard.Content className="p-4">
+                              <div className="grid grid-rows-[auto_auto_1fr_auto] gap-2 h-full">
+                                {/* Row 1: méta (catégorie + prix) */}
+                                <div className="flex items-center justify-between">
+                                  <span className="text-sm font-medium text-medical-primary bg-medical-primary/10 px-2 py-1 rounded">
+                                    {product.category || "Catégorie"}
+                                  </span>
+                                  <span className="text-lg font-bold text-gray-900">{product.priceLabel}</span>
+                                </div>
+
+                                {/* Row 2: titre (clamp 2 lignes) + rating */}
+                                <div>
+                                  <div className="clamp-2 line-clamp-2">
+                                    <MedicalCard.Title>{product.name}</MedicalCard.Title>
+                                    {product.reference && (
+                                      <p className="text-sm text-gray-500 mt-1">Réf : {product.reference}</p>
+                                    )}
+                                  </div>
+                                </div>
+
+                                {/* Row 3: zone variable poussée en 1fr (description + éventuelles features) */}
+                                <div className="min-h-0">
+                                  {product.description && (
+                                    <MedicalCard.Description className="clamp-5 line-clamp-5">
+                                      <div
+                                        className="prose prose-sm max-w-none"
+                                        dangerouslySetInnerHTML={{ __html: product.description }}
+                                      />
+                                    </MedicalCard.Description>
+                                  )}
+                                </div>
+
+                                {/* Row 4: boutons — toujours alignés en bas grâce à la 1fr au-dessus */}
+                                <div className="mt-2 flex gap-2 items-center">
+                                  {/* Bouton Commander */}
+                                  <MedicalButton
+                                    variant="primary"
+                                    size="sm"
+                                    className="flex-1"
+                                    onClick={() => {
+                                      const phone = "+21629785570";
+                                      const message = encodeURIComponent(
+                                        `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
+                                      );
+                                      window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
+                                    }}
+                                  >
+                                    <ShoppingCart className="mr-2 h-4 w-4" />
+                                    Commander
+                                  </MedicalButton>
+
+                                  {/* Bouton Info compact */}
+                                  <MedicalButton
+                                    variant="outline"
+                                    size="sm"
+                                    className="p-2 w-9 h-9 flex items-center justify-center"
+                                    onClick={() => openProductDetails(product.id)}
+                                    title="Voir les détails du produit"
+                                  >
+                                    <Info className="h-4 w-4" />
+                                  </MedicalButton>
+                                </div>
+                              </div>
+                            </MedicalCard.Content>
+                          </MedicalCard>
+                        );
+                      })}
+                    </div>
+                  </div>
+                    );
+                  })}
+                
+                {/* Load More Categories Button */}
+                {Object.keys(groupedProducts).length > 0 && 
+                 catOptions.filter(opt => opt.id !== "ALL").length > loadedCategories.size && (
+                  <div className="text-center mt-8">
+                    <MedicalButton
+                      variant="outline"
+                      onClick={loadMoreCategories}
+                      disabled={loadingMoreCategories}
+                    >
+                      {loadingMoreCategories ? "Chargement..." : "Voir plus de catégories"}
+                    </MedicalButton>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-16">
+                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Filter className="h-8 w-8 text-gray-400" />
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Aucun produit trouvé</h3>
+                <p className="text-gray-600 mb-6">Essayez de modifier vos critères de recherche ou de filtrage.</p>
+                <MedicalButton
+                  variant="primary"
+                  onClick={() => {
+                    setSelectedCatIds([]);
+                    setSearchTerm("");
+                  }}
+                >
+                  Réinitialiser les filtres
+                </MedicalButton>
+              </div>
+            )
           )}
         </div>
       </section>
