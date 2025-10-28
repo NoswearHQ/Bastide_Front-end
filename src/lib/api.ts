@@ -102,7 +102,7 @@ export type Product = {
   prix: string | null;
   devise: string;
   image_miniature: string | null;
-  galerie_json: string | null;
+  galerie_json: string[] | null;
   categorie_id: string;
   sous_categorie_id: string;
   est_actif: boolean;
@@ -119,7 +119,7 @@ export type Article = {
   slug: string;
   nom_auteur?: string | null;
   image_miniature?: string | null;
-  galerie_json?: string | null;
+  galerie_json?: string[] | null;
   extrait?: string | null;
   contenu_html: string;
   statut: string;
@@ -135,7 +135,7 @@ export type ArticleCreate = {
   slug: string;
   nom_auteur?: string;
   image_miniature?: string;
-  galerie_json?: string;
+  galerie_json?: string[];
   extrait?: string;
   contenu_html: string;
   statut: string;
@@ -222,7 +222,7 @@ export async function deleteProduct(id: string | number) {
 
 export type ProductDetail = Product & {
     image_miniature?: string | null;
-    galerie_json?: string | string[] | null;
+    galerie_json?: string[] | null;
     description_courte?: string | null;
     description_html?: string | null;
     categorie_id?: number | null;

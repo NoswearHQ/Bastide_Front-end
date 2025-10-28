@@ -38,7 +38,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     slug: "",
     nom_auteur: "",
     image_miniature: "",
-    galerie_json: "",
+    galerie_json: [],
     extrait: "",
     contenu_html: "",
     statut: "brouillon",
@@ -81,7 +81,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
         slug: existingArticle.slug,
         nom_auteur: existingArticle.nom_auteur || "",
         image_miniature: existingArticle.image_miniature || "",
-        galerie_json: existingArticle.galerie_json || "",
+        galerie_json: existingArticle.galerie_json || [],
         extrait: existingArticle.extrait || "",
         contenu_html: existingArticle.contenu_html,
         statut: existingArticle.statut,
@@ -173,7 +173,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     try {
       const submitData = {
         ...formData,
-        galerie_json: JSON.stringify(galleryImages),
+        galerie_json: galleryImages,
         publie_le: formData.statut === "publie" && !formData.publie_le 
           ? new Date().toISOString() 
           : formData.publie_le || undefined,
