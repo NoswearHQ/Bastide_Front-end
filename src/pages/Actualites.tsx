@@ -28,17 +28,6 @@ export default function Actualites() {
   const articles = articlesData?.rows || [];
   const totalPages = Math.ceil((articlesData?.total || 0) / articlesPerPage);
 
-  // Debug: Log articles data
-  useEffect(() => {
-    if (articles.length > 0) {
-      console.log('Articles data:', articles.map(a => ({
-        id: a.id,
-        titre: a.titre,
-        image_miniature: a.image_miniature,
-        constructedUrl: a.image_miniature ? safeProductImage(a.image_miniature) : 'No image'
-      })));
-    }
-  }, [articles]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -159,18 +148,13 @@ export default function Actualites() {
                           src={article.image_miniature ? safeProductImage(article.image_miniature) : "https://api.bastide.com.tn/images/bastidelogo.png"}
                           alt={article.titre}
                           className="w-full h-full object-cover"
-                          onError={(e) => {
-                            console.log('Actualites image failed to load:', {
-                              originalSrc: article.image_miniature,
-                              constructedUrl: safeProductImage(article.image_miniature),
-                              currentSrc: e.currentTarget.src
-                            });
-                            // Prevent infinite loop by checking if already set to fallback
-                            if (!e.currentTarget.src.includes('data:image')) {
-                              // Use a simple data URI placeholder instead of external image
-                              e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
-                            }
-                          }}
+                            onError={(e) => {
+                              // Prevent infinite loop by checking if already set to fallback
+                              if (!e.currentTarget.src.includes('data:image')) {
+                                // Use a simple data URI placeholder instead of external image
+                                e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
+                              }
+                            }}
                         />
                       </div>
                       <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
