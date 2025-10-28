@@ -22,7 +22,10 @@ export function imageUrl(pathFromApi?: string | null): string {
   
   const encoded = encodeImagePath(finalPath);
   const base = API_BASE.replace(/\/$/, "");
-  return `${base}/${encoded}`;
+  const result = `${base}/${encoded}`;
+  
+  
+  return result;
 }
 
 /**
@@ -35,9 +38,6 @@ export function parseGallery(galerie_json?: string | string[] | null): string[] 
     const arr = Array.isArray(galerie_json)
       ? galerie_json
       : JSON.parse(galerie_json);
-
-    console.log('🔍 Raw gallery data:', galerie_json);
-    console.log('🔍 Parsed gallery array:', arr);
 
     const result = (arr || [])
       .filter((x: any) => typeof x === "string" && x.trim())
@@ -58,20 +58,7 @@ export function parseGallery(galerie_json?: string | string[] | null): string[] 
         
         // If it has a path structure, prepend 'images/'
         return `images/${cleanPath}`;
-      })
-      .map(path => {
-        // Test if the constructed path exists by trying a few variations
-        const variations = [
-          path, // Original path
-          path.replace(/^images\/articles\/[^\/]+\//, 'images/'), // Remove article slug
-          path.replace(/^images\//, ''), // Remove images prefix
-        ];
-        
-        console.log('🔍 Testing path variations for:', path, variations);
-        return path; // Return the original path for now
       });
-
-    console.log('🔍 Final gallery paths:', result);
     return result;
   } catch (error) {
     console.error('❌ Error parsing gallery JSON:', error);
@@ -122,8 +109,16 @@ export function safeGalleryImage(imagePath: string): string {
 }
 
 function encodeImagePath(path: string): string {
-  // Sépare pour encoder correctement chaque segment sans toucher aux '/'
-  return path
+  // First, try to decode the path to normalize it
+  let normalizedPath: string;
+  try {
+    normalizedPath = decodeURI(path);
+  } catch {
+    normalizedPath = path;
+  }
+  
+  // Then encode each segment properly
+  return normalizedPath
     .split("/")
     .map((seg) => encodeURI(seg))
     .join("/");

@@ -134,23 +134,74 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Store the full path that matches the backend structure
-      const fileName = file.name;
-      const slug = formData.slug || 'temp-slug';
-      const fullPath = `images/articles/${slug}/${fileName}`;
-      setImagePreview(URL.createObjectURL(file));
-      setFormData(prev => ({ ...prev, image_miniature: fullPath }));
+      try {
+        // Upload the file to the server
+        const uploadFormData = new FormData();
+        uploadFormData.append('titre', formData.titre || 'temp');
+        uploadFormData.append('images', file);
+        
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://api.bastide.com.tn'}/crud/articles/upload`, {
+          method: 'POST',
+          body: uploadFormData,
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+          }
+        });
+        
+        if (response.ok) {
+          const result = await response.json();
+          if (result.images && result.images.length > 0) {
+            const imagePath = result.images[0];
+            setImagePreview(URL.createObjectURL(file));
+            setFormData(prev => ({ ...prev, image_miniature: imagePath }));
+            toast.success("Image uploadée avec succès");
+          }
+        } else {
+          toast.error("Erreur lors de l'upload de l'image");
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error("Erreur lors de l'upload de l'image");
+      }
     }
   };
 
-  const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const slug = formData.slug || 'temp-slug';
-    const fileNames = files.map(file => `images/articles/${slug}/${file.name}`);
-    setGalleryImages(prev => [...prev, ...fileNames]);
+    if (files.length === 0) return;
+
+    try {
+      // Upload all files to the server
+      const uploadFormData = new FormData();
+      uploadFormData.append('titre', formData.titre || 'temp');
+      files.forEach(file => {
+        uploadFormData.append('images', file);
+      });
+      
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://api.bastide.com.tn'}/crud/articles/upload`, {
+        method: 'POST',
+        body: uploadFormData,
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.images && result.images.length > 0) {
+          setGalleryImages(prev => [...prev, ...result.images]);
+          toast.success(`${result.images.length} image(s) uploadée(s) avec succès`);
+        }
+      } else {
+        toast.error("Erreur lors de l'upload des images");
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error("Erreur lors de l'upload des images");
+    }
   };
 
   const removeGalleryImage = (index: number) => {
@@ -369,14 +420,6 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                 Image principale
               </label>
               
-              {/* Debug Info */}
-              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
-                <p><strong>Debug Info:</strong></p>
-                <p>API_BASE: {(import.meta as any).env.VITE_API_BASE_URL || 'NOT_SET'}</p>
-                <p>imagePreview: {imagePreview || 'null'}</p>
-                <p>Constructed URL: {imagePreview ? safeProductImage(imagePreview) : 'N/A'}</p>
-                <p>galleryImages count: {galleryImages.length}</p>
-              </div>
               <div className="flex items-center gap-4">
                 <input
                   type="file"
