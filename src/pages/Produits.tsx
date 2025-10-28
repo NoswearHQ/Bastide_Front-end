@@ -690,7 +690,7 @@ const loadMoreCategories = async () => {
     size="sm"
     className="flex-1"
     onClick={() => {
-      const phone = "+21629785570";
+      const phone = "+21629380898";
       const message = encodeURIComponent(
         `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
       );
@@ -843,7 +843,7 @@ const loadMoreCategories = async () => {
                                     size="sm"
                                     className="flex-1"
                                     onClick={() => {
-                                      const phone = "+21629785570";
+                                      const phone = "+21629380898";
                                       const message = encodeURIComponent(
                                         `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
                                       );
@@ -925,7 +925,7 @@ const loadMoreCategories = async () => {
   <MedicalButton
     variant="primary"
     onClick={() => {
-      const phone = "+21629785570"; // 📞 numéro WhatsApp de Bastide Tunisie
+      const phone = "+21629380898"; // 📞 numéro WhatsApp de Bastide Tunisie
       const message = encodeURIComponent(
         "Bonjour 👋, je souhaite être mis en contact avec un expert Bastide Tunisie pour plus d’informations."
       );
@@ -939,7 +939,7 @@ const loadMoreCategories = async () => {
   <MedicalButton
     variant="outline"
     onClick={() => {
-      const phone = "+21629785570"; // même numéro WhatsApp
+      const phone = "+21629380898"; // même numéro WhatsApp
       const message = encodeURIComponent(
         "Bonjour 👋, je souhaite obtenir un devis pour du matériel médical Bastide Tunisie."
       );
@@ -1038,7 +1038,7 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
           size="sm"
           className="flex-1"
           onClick={() => {
-            const phone = "+21629785570";
+            const phone = "+21629380898";
             const message = encodeURIComponent(
               `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.titre}\n\nMerci de me confirmer la disponibilité.`
             );
