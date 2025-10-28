@@ -2,13 +2,7 @@ import { ArrowRight, Heart, Shield, Users, Clock, CheckCircle, Star } from "luci
 import { Link } from "react-router-dom";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
-import heroImage from "@/assets/hero-medical1.jpg";
-import Service1Image from "@/assets/s1.jpg";
-import Service2Image from "@/assets/s2.jpg";
-import Service3Image from "@/assets/s4.jpg";
-import Service4Image from "@/assets/s4.png";
-import servicesImage from "@/assets/services-icons.jpg";
-import productsImage from "@/assets/products-display.jpg";
+import { safeProductImage } from "@/lib/images";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useState } from "react";
 import { getCategories, type Category } from "@/lib/api";
@@ -136,7 +130,7 @@ export default function Home() {
 
       <div className="relative">
         <img
-          src={heroImage}
+          src={safeProductImage("images/hero-medical1.jpg")}
           alt="Établissement médical moderne avec équipe soignante"
           className="w-full h-[500px] object-cover rounded-2xl shadow-medical-xl"
         />
@@ -240,7 +234,7 @@ export default function Home() {
       {/* Service 1 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <img
-          src={Service1Image}
+          src={safeProductImage("images/s1.jpg")}
           alt="Location de matériel médical"
           className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
         />
@@ -260,7 +254,7 @@ export default function Home() {
       {/* Service 2 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <img
-          src={Service2Image}
+          src={safeProductImage("images/s2.jpg")}
           alt="Maintien à domicile"
           className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
         />
@@ -280,7 +274,7 @@ export default function Home() {
       {/* Service 3 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <img
-          src={Service4Image}
+          src={safeProductImage("images/s4.png")}
           alt="Réseau Bastide"
           className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
         />
@@ -301,7 +295,7 @@ export default function Home() {
       {/* Service 4 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <img
-          src={Service3Image}
+          src={safeProductImage("images/s4.jpg")}
           alt="Service client Bastide"
           className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
         />
@@ -330,7 +324,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <img
-                src={servicesImage}
+                src={safeProductImage("images/services-icons.jpg")}
                 alt="Services médicaux et équipements modernes"
                 className="w-full h-[400px] object-cover rounded-xl shadow-medical"
               />

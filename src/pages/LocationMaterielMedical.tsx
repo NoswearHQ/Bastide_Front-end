@@ -2,11 +2,10 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MessageCircle, Wrench, Lightbulb, Clock, Truck } from "lucide-react";
-import LocationImage from "@/assets/LocationImage.jpg";
-import JeunesImage from "@/assets/vieil-homme-dans-une-maison-de-soins-infirmiers-fist-bumping-infirmiere.jpg";
+import { safeProductImage } from "@/lib/images";
 import { useEffect } from "react";
-import Magasin1Image from "@/assets/s4.png";
-import Magasin2Image from "@/assets/boutique2.jpeg";
+const Magasin1Image = safeProductImage("images/s4.png");
+const Magasin2Image = safeProductImage("images/boutique2.jpeg");
 export default function LocationMateriel() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -71,7 +70,7 @@ export default function LocationMateriel() {
           {/* Image à droite */}
           <div className="rounded-2xl overflow-hidden shadow-lg">
             <img
-              src={LocationImage}
+              src={safeProductImage("images/LocationImage.jpg")}
               alt="Location de matériel médical"
               className="w-full h-full object-cover"
             />
@@ -221,7 +220,7 @@ export default function LocationMateriel() {
             {/* Image à droite */}
             <div className="rounded-2xl overflow-hidden shadow-md">
               <img
-                src={JeunesImage}
+                src={safeProductImage("images/vieil-homme-dans-une-maison-de-soins-infirmiers-fist-bumping-infirmiere.jpg")}
                 alt="Nos agents Bastide Tunisie"
                 className="w-full h-full object-cover"
               />
