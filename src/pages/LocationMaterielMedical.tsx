@@ -3,6 +3,7 @@ import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MessageCircle, Wrench, Lightbulb, Clock, Truck } from "lucide-react";
 import { safeProductImage } from "@/lib/images";
+import Seo from "@/components/Seo";
 import { useEffect } from "react";
 const Magasin1Image = safeProductImage("images/s4.png");
 const Magasin2Image = safeProductImage("images/boutique2.jpeg");
@@ -28,6 +29,12 @@ export default function LocationMateriel() {
 
   return (
     <Layout>
+      <Seo
+        title="Location de matériel médical — Bastide Tunisie"
+        description="Louez lit médicalisé, fauteuil roulant, matelas à air, lève-personne. Installation et mise en service à domicile."
+        canonical="https://bastide.tn/location-materiel"
+        image={safeProductImage("images/bastidelogo.png")}
+      />
       {/* Hero Section */}
       <section className="bg-gradient-primary text-white py-16">
         <div className="medical-container">

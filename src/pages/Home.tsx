@@ -7,6 +7,7 @@ import Layout from "@/components/layout/Layout";
 import { useEffect, useState } from "react";
 import { getCategories, type Category } from "@/lib/api";
 import CategoryPillarsDynamic from "@/components/catalog/CategoryPillarsDynamic";
+import Seo from "@/components/Seo";
 
 const PillarCard = ({ title, categoryId }: { title: string; categoryId: string }) => (
   <Link
@@ -100,6 +101,13 @@ export default function Home() {
     .map(c => ({ title: wantedSlugs.get(c.slug)!, id: c.id }));
   return (
     <Layout>
+    <Seo
+      title="Bastide Tunisie — Matériel & confort médical"
+      description="Vente et location de matériel médical. Maintien à domicile, mobilité, incontinence, équipements de santé en Tunisie."
+      canonical="https://bastide.tn/"
+      image={safeProductImage("images/bastidelogo.png")}
+      type="website"
+    />
     <div>
       {/* Hero Section */}
       <section className="medical-hero">

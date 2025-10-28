@@ -13,6 +13,7 @@ import {
   Tag
 } from "lucide-react";
 import Layout from "@/components/layout/Layout";
+import Seo from "@/components/Seo";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
@@ -142,20 +143,13 @@ export default function ArticleDetail() {
 
   return (
     <Layout>
-      {/* SEO Meta Tags */}
-      <head>
-        <title>{article.seo_titre || article.titre} | Bastide Le Confort Médical</title>
-        <meta name="description" content={article.seo_description || article.extrait || ''} />
-        <meta property="og:title" content={article.titre} />
-        <meta property="og:description" content={article.extrait || ''} />
-        <meta property="og:image" content={article.image_miniature || ''} />
-        <meta property="og:url" content={window.location.href} />
-        <meta property="og:type" content="article" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={article.titre} />
-        <meta name="twitter:description" content={article.extrait || ''} />
-        <meta name="twitter:image" content={article.image_miniature || ''} />
-      </head>
+      <Seo
+        title={`${article.seo_titre || article.titre} | Bastide Tunisie`}
+        description={article.seo_description || article.extrait || ''}
+        canonical={typeof window !== 'undefined' ? window.location.href : undefined}
+        image={article.image_miniature || undefined}
+        type="article"
+      />
 
       {/* Breadcrumb */}
       <section className="bg-gray-50 py-4">

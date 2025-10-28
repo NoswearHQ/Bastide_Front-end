@@ -18,6 +18,7 @@ import {
 } from "@/lib/api";
 import { toUiProduct, type UiProduct } from "@/types/shop";
 import { imageUrl, safeProductImage, parseGallery } from "@/lib/images";
+import Seo from "@/components/Seo";
 import { useSearchParams } from "react-router-dom";
 // ---------- Helpers (décodage/stripping & fallback desc)
 function htmlDecode(input: string): string {
@@ -484,6 +485,11 @@ const loadMoreCategories = async () => {
 
   return (
     <Layout>
+      <Seo
+        title="Produits médicaux — Bastide Tunisie"
+        description="Découvrez notre catalogue de matériel médical : mobilité, incontinence, confort et soins. Vente et location en Tunisie."
+        canonical="https://bastide.tn/produits"
+      />
       {/* Hero Section */}
       <section className="bg-gradient-primary text-white py-16">
         <div className="medical-container">
