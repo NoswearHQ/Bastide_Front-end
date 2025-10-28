@@ -345,3 +345,17 @@ export async function patchArticle(id: string | number, payload: Partial<Article
 export async function deleteArticle(id: string | number) {
   return fetchWithAuth<void>(`/crud/articles/${id}`, { method: "DELETE" });
 }
+
+// 🔹 Upload d'images pour un article (protégée)
+export async function uploadArticleImages(titre: string, images: File[]): Promise<{ message: string; images: string[] }> {
+  const formData = new FormData();
+  formData.append('titre', titre);
+  images.forEach(file => {
+    formData.append('images', file);
+  });
+  
+  return fetchWithAuth<{ message: string; images: string[] }>(`/crud/articles/upload`, {
+    method: "POST",
+    body: formData,
+  });
+}

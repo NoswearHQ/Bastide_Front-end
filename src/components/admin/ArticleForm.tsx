@@ -19,6 +19,7 @@ import {
   createArticle, 
   updateArticle, 
   getArticleById, 
+  uploadArticleImages,
   type ArticleCreate, 
   type ArticleUpdate 
 } from "@/lib/api";
@@ -138,33 +139,22 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     const file = event.target.files?.[0];
     if (file) {
       try {
-        // Upload the file to the server
-        const uploadFormData = new FormData();
-        uploadFormData.append('titre', formData.titre || 'temp');
-        uploadFormData.append('images', file);
+        console.log('🔍 Uploading main image:', file.name);
+        console.log('🔍 Article title:', formData.titre);
+        console.log('🔍 Auth token available:', !!localStorage.getItem('accessToken'));
         
-        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://api.bastide.com.tn'}/crud/articles/upload`, {
-          method: 'POST',
-          body: uploadFormData,
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        const result = await uploadArticleImages(formData.titre || 'temp', [file]);
+        console.log('🔍 Upload result:', result);
         
-        if (response.ok) {
-          const result = await response.json();
-          if (result.images && result.images.length > 0) {
-            const imagePath = result.images[0];
-            setImagePreview(URL.createObjectURL(file));
-            setFormData(prev => ({ ...prev, image_miniature: imagePath }));
-            toast.success("Image uploadée avec succès");
-          }
-        } else {
-          toast.error("Erreur lors de l'upload de l'image");
+        if (result.images && result.images.length > 0) {
+          const imagePath = result.images[0];
+          setImagePreview(URL.createObjectURL(file));
+          setFormData(prev => ({ ...prev, image_miniature: imagePath }));
+          toast.success("Image uploadée avec succès");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Upload error:', error);
-        toast.error("Erreur lors de l'upload de l'image");
+        toast.error(`Erreur lors de l'upload de l'image: ${error.message}`);
       }
     }
   };
@@ -174,33 +164,14 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     if (files.length === 0) return;
 
     try {
-      // Upload all files to the server
-      const uploadFormData = new FormData();
-      uploadFormData.append('titre', formData.titre || 'temp');
-      files.forEach(file => {
-        uploadFormData.append('images', file);
-      });
-      
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'https://api.bastide.com.tn'}/crud/articles/upload`, {
-        method: 'POST',
-        body: uploadFormData,
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.images && result.images.length > 0) {
-          setGalleryImages(prev => [...prev, ...result.images]);
-          toast.success(`${result.images.length} image(s) uploadée(s) avec succès`);
-        }
-      } else {
-        toast.error("Erreur lors de l'upload des images");
+      const result = await uploadArticleImages(formData.titre || 'temp', files);
+      if (result.images && result.images.length > 0) {
+        setGalleryImages(prev => [...prev, ...result.images]);
+        toast.success(`${result.images.length} image(s) uploadée(s) avec succès`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Upload error:', error);
-      toast.error("Erreur lors de l'upload des images");
+      toast.error(`Erreur lors de l'upload des images: ${error.message}`);
     }
   };
 
