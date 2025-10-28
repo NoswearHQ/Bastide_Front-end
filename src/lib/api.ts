@@ -350,9 +350,16 @@ export async function deleteArticle(id: string | number) {
 export async function uploadArticleImages(titre: string, images: File[]): Promise<{ message: string; images: string[] }> {
   const formData = new FormData();
   formData.append('titre', titre);
+  
+  // Use 'images[]' format like the working product uploads
   images.forEach(file => {
-    formData.append('images', file);
+    formData.append('images[]', file);
   });
+  
+  console.log('🔍 FormData contents:');
+  for (let [key, value] of formData.entries()) {
+    console.log(key, value instanceof File ? `File: ${value.name}` : value);
+  }
   
   return fetchWithAuth<{ message: string; images: string[] }>(`/crud/articles/upload`, {
     method: "POST",
