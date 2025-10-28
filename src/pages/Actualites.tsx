@@ -28,6 +28,18 @@ export default function Actualites() {
   const articles = articlesData?.rows || [];
   const totalPages = Math.ceil((articlesData?.total || 0) / articlesPerPage);
 
+  // Debug: Log articles data
+  useEffect(() => {
+    if (articles.length > 0) {
+      console.log('🔍 Articles data debug:', articles.map(a => ({
+        id: a.id,
+        titre: a.titre,
+        image_miniature: a.image_miniature,
+        constructedUrl: a.image_miniature ? safeProductImage(a.image_miniature) : 'No image',
+        galerie_json: a.galerie_json
+      })));
+    }
+  }, [articles]);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -134,12 +146,26 @@ export default function Actualites() {
         </div>
       </section>
 
-      {/* Articles Section */}
-      <section className="medical-section">
-        <div className="medical-container">
-          {articles.length > 0 ? (
-            <>
-              <div className="medical-grid medical-grid--3">
+            {/* Articles Section */}
+            <section className="medical-section">
+              <div className="medical-container">
+                {/* Test Image Debug */}
+                <div className="mb-8 p-4 bg-yellow-100 border border-yellow-300 rounded">
+                  <h3 className="font-bold mb-2">🧪 Image URL Test:</h3>
+                  <p>API_BASE: {(import.meta as any).env.VITE_API_BASE_URL || 'NOT_SET'}</p>
+                  <p>Test URL: {safeProductImage('images/s4.png')}</p>
+                  <img 
+                    src={safeProductImage('images/s4.png')} 
+                    alt="Test" 
+                    className="w-32 h-24 object-cover border border-gray-300"
+                    onLoad={() => console.log('✅ Test image loaded successfully')}
+                    onError={() => console.log('❌ Test image failed to load')}
+                  />
+                </div>
+
+                {articles.length > 0 ? (
+                  <>
+                    <div className="medical-grid medical-grid--3">
                 {articles.map((article) => (
                   <MedicalCard key={article.id}>
                     <div className="relative">

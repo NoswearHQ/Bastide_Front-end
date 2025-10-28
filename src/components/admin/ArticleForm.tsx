@@ -368,6 +368,15 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Image principale
               </label>
+              
+              {/* Debug Info */}
+              <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded text-sm">
+                <p><strong>Debug Info:</strong></p>
+                <p>API_BASE: {(import.meta as any).env.VITE_API_BASE_URL || 'NOT_SET'}</p>
+                <p>imagePreview: {imagePreview || 'null'}</p>
+                <p>Constructed URL: {imagePreview ? safeProductImage(imagePreview) : 'N/A'}</p>
+                <p>galleryImages count: {galleryImages.length}</p>
+              </div>
               <div className="flex items-center gap-4">
                 <input
                   type="file"

@@ -1,5 +1,5 @@
 // src/lib/images.ts
-const API_BASE = (import.meta as any).env.VITE_API_BASE_URL || "";
+const API_BASE = (import.meta as any).env.VITE_API_BASE_URL || "https://api.bastide.com.tn";
 console.log('🔧 API_BASE in images.ts:', API_BASE);
 
 /**
