@@ -54,9 +54,13 @@ export default function Services() {
             {/* Service 1 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={safeProductImage("images/s1.jpg")}
+                src={safeProductImage("images/s1.webp")}
                 alt="Location de matériel médical"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+                width={480}
+                height={320}
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
                 <h3 className="text-lg font-semibold mb-3">
@@ -74,9 +78,13 @@ export default function Services() {
             {/* Service 2 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={safeProductImage("images/s2.jpg")}
+                src={safeProductImage("images/s2.webp")}
                 alt="Maintien à domicile"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+                width={433}
+                height={320}
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
                 <h3 className="text-lg font-semibold mb-3">
@@ -94,9 +102,13 @@ export default function Services() {
             {/* Service 3 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={safeProductImage("images/s4.png")}
+                src={safeProductImage("images/s4.webp")}
                 alt="Réseau Bastide Tunisie"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+                width={569}
+                height={320}
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
                 <h3 className="text-lg font-semibold mb-3">
@@ -114,9 +126,13 @@ export default function Services() {
             {/* Service 4 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={safeProductImage("images/s4.jpg")}
+                src={safeProductImage("images/s4.webp")}
                 alt="Service client Bastide"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+                width={480}
+                height={320}
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
                 <h3 className="text-lg font-semibold mb-3">
