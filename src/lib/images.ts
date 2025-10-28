@@ -50,11 +50,21 @@ export function parseGallery(galerie_json?: string | string[] | null): string[] 
 export function safeProductImage(imagePath?: string | null): string {
   if (!imagePath) return placeholder();
   const result = imageUrl(imagePath);
-  console.log('🔍 safeProductImage debug:', { 
-    input: imagePath, 
-    output: result,
-    apiBase: API_BASE 
-  });
+  
+  // Test if the image URL is accessible
+  if (result.startsWith('http')) {
+    fetch(result, { method: 'HEAD' })
+      .then(response => {
+        console.log(`🔍 Image accessibility test: ${result} - Status: ${response.status}`);
+        if (!response.ok) {
+          console.log(`❌ Image not accessible: ${result} - Status: ${response.status}`);
+        }
+      })
+      .catch(error => {
+        console.log(`❌ Image fetch error: ${result} - Error:`, error);
+      });
+  }
+  
   return result;
 }
 
