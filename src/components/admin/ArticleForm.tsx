@@ -91,16 +91,28 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
       });
 
       if (existingArticle.image_miniature) {
-        setImagePreview(existingArticle.image_miniature);
+        // Check if it's a base64 data URL or a filename
+        if (existingArticle.image_miniature.startsWith('data:')) {
+          setImagePreview(existingArticle.image_miniature);
+        } else {
+          // It's a filename, we need to construct the full URL
+          const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/images/articles/${existingArticle.slug}/${existingArticle.image_miniature}`;
+          setImagePreview(imageUrl);
+        }
       }
 
       if (existingArticle.galerie_json) {
-        try {
-          const gallery = JSON.parse(existingArticle.galerie_json);
-          setGalleryImages(Array.isArray(gallery) ? gallery : []);
-        } catch {
-          setGalleryImages([]);
-        }
+        const gallery = Array.isArray(existingArticle.galerie_json) ? existingArticle.galerie_json : [];
+        // Check if images are base64 data URLs or filenames
+        const processedGallery = gallery.map(img => {
+          if (img.startsWith('data:')) {
+            return img;
+          } else {
+            // It's a filename, construct the full URL
+            return `${import.meta.env.VITE_API_BASE_URL}/images/articles/${existingArticle.slug}/${img}`;
+          }
+        });
+        setGalleryImages(processedGallery);
       }
     }
   }, [existingArticle, mode]);
@@ -149,8 +161,14 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
 
   const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    const fileNames = files.map(file => file.name);
-    setGalleryImages(prev => [...prev, ...fileNames]);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setGalleryImages(prev => [...prev, result]);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const removeGalleryImage = (index: number) => {
@@ -169,6 +187,8 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
           ? new Date().toISOString() 
           : formData.publie_le || undefined,
       };
+
+      console.log('Submitting article with data:', submitData);
 
       if (mode === "create") {
         await createMutation.mutateAsync(submitData);

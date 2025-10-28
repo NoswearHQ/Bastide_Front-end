@@ -314,11 +314,7 @@ export async function getArticleById(id: string | number): Promise<Article> {
 
 // 🔹 Récupération d'un article par slug (publique)
 export async function getArticleBySlug(slug: string): Promise<Article> {
-  const articles = await fetchPublic<Paginated<Article>>(`/crud/articles?search=${encodeURIComponent(slug)}&limit=1`);
-  if (articles.rows.length === 0) {
-    throw new Error('Article not found');
-  }
-  return articles.rows[0];
+  return fetchPublic<Article>(`/crud/articles/slug/${encodeURIComponent(slug)}`);
 }
 
 // 🔹 Création d'un article (protégée)
