@@ -140,26 +140,17 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setImagePreview(result);
-        setFormData(prev => ({ ...prev, image_miniature: result }));
-      };
-      reader.readAsDataURL(file);
+      // For now, just store the filename instead of base64
+      const fileName = file.name;
+      setImagePreview(URL.createObjectURL(file));
+      setFormData(prev => ({ ...prev, image_miniature: fileName }));
     }
   };
 
   const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setGalleryImages(prev => [...prev, result]);
-      };
-      reader.readAsDataURL(file);
-    });
+    const fileNames = files.map(file => file.name);
+    setGalleryImages(prev => [...prev, ...fileNames]);
   };
 
   const removeGalleryImage = (index: number) => {
