@@ -10,8 +10,10 @@
     <meta name="robots" content="index, follow" />
 
     <link rel="canonical" href="https://bastide.tn/" />
-    <link rel="alternate" href="https://bastide.tn/" hreflang="fr-tn" />
-    <link rel="alternate" href="https://bastide.tn/" hreflang="fr" />
+    <!-- hreflang set including self-referential and x-default -->
+    <link rel="alternate" hreflang="fr-tn" href="https://bastide.tn/" />
+    <link rel="alternate" hreflang="fr" href="https://bastide.tn/" />
+    <link rel="alternate" hreflang="x-default" href="https://bastide.tn/" />
     <meta name="theme-color" content="#1e90ff" />
 
     <meta property="og:title" content="Bastide - Le confort médical en Tunisie" />
@@ -61,6 +63,12 @@
   </head>
 
   <body>
+    <noscript>
+      <div class="sr-only">
+        <h1>Bastide Tunisie — Matériel et confort médical</h1>
+        <p>Vente et location de matériel médical en Tunisie : mobilité, incontinence, maintien à domicile et équipements de santé.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
