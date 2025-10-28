@@ -36,10 +36,45 @@ export function parseGallery(galerie_json?: string | string[] | null): string[] 
       ? galerie_json
       : JSON.parse(galerie_json);
 
-    return (arr || [])
+    console.log('🔍 Raw gallery data:', galerie_json);
+    console.log('🔍 Parsed gallery array:', arr);
+
+    const result = (arr || [])
       .filter((x: any) => typeof x === "string" && x.trim())
-      .map((s: string) => s.replace(/^\//, ""));
-  } catch {
+      .map((s: string) => {
+        // Remove leading slash if present
+        const cleanPath = s.replace(/^\//, "");
+        
+        // If the path already starts with 'images/', return as is
+        if (cleanPath.startsWith('images/')) {
+          return cleanPath;
+        }
+        
+        // If it's just a filename, try different possible locations
+        if (!cleanPath.includes('/')) {
+          // Try direct in images folder first
+          return `images/${cleanPath}`;
+        }
+        
+        // If it has a path structure, prepend 'images/'
+        return `images/${cleanPath}`;
+      })
+      .map(path => {
+        // Test if the constructed path exists by trying a few variations
+        const variations = [
+          path, // Original path
+          path.replace(/^images\/articles\/[^\/]+\//, 'images/'), // Remove article slug
+          path.replace(/^images\//, ''), // Remove images prefix
+        ];
+        
+        console.log('🔍 Testing path variations for:', path, variations);
+        return path; // Return the original path for now
+      });
+
+    console.log('🔍 Final gallery paths:', result);
+    return result;
+  } catch (error) {
+    console.error('❌ Error parsing gallery JSON:', error);
     return [];
   }
 }
@@ -66,6 +101,24 @@ export function safeProductImage(imagePath?: string | null): string {
   }
   
   return result;
+}
+
+/**
+ * Retourne une image de galerie avec fallback
+ */
+export function safeGalleryImage(imagePath: string): string {
+  if (!imagePath) return placeholder();
+  
+  // Try different possible paths for gallery images
+  const possiblePaths = [
+    imagePath, // Original path
+    imagePath.replace(/^images\/articles\/[^\/]+\//, 'images/'), // Remove article slug
+    imagePath.replace(/^images\//, ''), // Remove images prefix
+    `images/${imagePath}`, // Add images prefix
+  ];
+  
+  // For now, return the original path and let the error handling in the component deal with it
+  return imageUrl(imagePath);
 }
 
 function encodeImagePath(path: string): string {

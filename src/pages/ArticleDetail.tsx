@@ -18,7 +18,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { getArticleBySlug, getArticles, type Article } from "@/lib/api";
-import { parseGallery, safeProductImage } from "@/lib/images";
+import { parseGallery, safeProductImage, safeGalleryImage } from "@/lib/images";
 
 export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -281,7 +281,7 @@ export default function ArticleDetail() {
                       {galleryImages.map((image, index) => (
                         <div key={index} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
                           <img
-                            src={safeProductImage(image)}
+                            src={safeGalleryImage(image)}
                             alt={`Galerie ${index + 1}`}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             onError={(e) => {
