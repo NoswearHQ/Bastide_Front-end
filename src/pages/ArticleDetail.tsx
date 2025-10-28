@@ -181,22 +181,25 @@ export default function ArticleDetail() {
             {/* Article Header */}
             <article className="bg-white rounded-lg shadow-lg overflow-hidden">
               {/* Main Image */}
-              {article.image_miniature && (
-                <div className="aspect-video bg-gray-200">
-                  <img
-                    src={safeProductImage(article.image_miniature)}
-                    alt={article.titre}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Prevent infinite loop by checking if already set to fallback
-                      if (!e.currentTarget.src.includes('data:image')) {
-                        // Use a simple data URI placeholder instead of external image
-                        e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
-                      }
-                    }}
-                  />
-                </div>
-              )}
+              <div className="aspect-video bg-gray-200">
+                <img
+                  src={article.image_miniature ? safeProductImage(article.image_miniature) : "https://api.bastide.com.tn/images/bastidelogo.png"}
+                  alt={article.titre}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log('Image failed to load:', {
+                      originalSrc: article.image_miniature,
+                      constructedUrl: safeProductImage(article.image_miniature),
+                      currentSrc: e.currentTarget.src
+                    });
+                    // Prevent infinite loop by checking if already set to fallback
+                    if (!e.currentTarget.src.includes('data:image')) {
+                      // Use a simple data URI placeholder instead of external image
+                      e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
+                    }
+                  }}
+                />
+              </div>
 
               <div className="p-8">
                 {/* Article Meta */}

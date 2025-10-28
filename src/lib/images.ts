@@ -1,5 +1,6 @@
 // src/lib/images.ts
 const API_BASE = (import.meta as any).env.VITE_API_BASE_URL || "";
+console.log('API_BASE in images.ts:', API_BASE);
 
 /**
  * Construit une URL absolue vers le backend public /images à partir d'un chemin relatif
@@ -44,7 +45,9 @@ export function parseGallery(galerie_json?: string | string[] | null): string[] 
  */
 export function safeProductImage(imagePath?: string | null): string {
   if (!imagePath) return placeholder();
-  return imageUrl(imagePath);
+  const result = imageUrl(imagePath);
+  console.log('safeProductImage:', { input: imagePath, output: result });
+  return result;
 }
 
 function encodeImagePath(path: string): string {
