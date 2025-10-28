@@ -115,6 +115,7 @@ export default function Produits() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
+  const multiSelect = selectedCatIds.length > 1;
   
   // Grouped products for display when no category selected
   const [groupedProducts, setGroupedProducts] = useState<Record<string, UiProduct[]>>({});
@@ -211,24 +212,71 @@ useEffect(() => {
   setError(null);
 
   if (selectedCatIds.length > 0) {
-    // Mode filtrage: afficher les produits des catégories sélectionnées
+    // --- MULTI-CATÉGORIES: union des résultats
+    if (multiSelect) {
+      const limitPerCat = productsPerPage;
+      Promise.all(
+        selectedCatIds.map((catId) =>
+          getProducts({
+            search: debouncedSearchTerm || undefined,
+            page: 1,
+            limit: limitPerCat,
+            order: orderParam,
+            categoryId: catId,
+          })
+        )
+      )
+        .then((responses) => {
+          const merged: Record<string, Product> = {};
+          responses.forEach((res) => {
+            const list = (res.rows as Product[]) || [];
+            list.forEach((p) => {
+              merged[String(p.id)] = p;
+            });
+          });
+
+          const uniqueRaw = Object.values(merged);
+          const ui = uniqueRaw.map((p) => {
+            const base = toUiProduct(p);
+            const desc = base.description ?? makeDescriptionFromRaw(p);
+            return {
+              ...base,
+              category: catMap.get(String((p as any).categorie_id)) || base.category || "Catégorie",
+              description: desc,
+            } as UiProduct & { description?: string };
+          });
+
+          const idx: Record<string, Product> = {};
+          uniqueRaw.forEach((p) => (idx[String(p.id)] = p));
+
+          setRows(ui);
+          setRawById(idx);
+          setTotal(ui.length);
+          setGroupedProducts({});
+        })
+        .catch((e) => setError(String(e?.message || e)))
+        .finally(() => setLoading(false));
+      return;
+    }
+
+    // Mono-catégorie classique avec pagination
     const query: ProductQuery = {
       search: debouncedSearchTerm || undefined,
       page: currentPage,
       limit: productsPerPage,
       order: orderParam,
-      categoryId: selectedCatIds[0], // Pour l'instant, on prend la première catégorie
+      categoryId: selectedCatIds[0],
     };
 
     getProducts(query)
       .then((res) => {
-        const rawList = (res.rows as Product[]) || [];
+        const rawList = ((res.rows as Product[]) || []);
         const ui = rawList.map((p) => {
           const base = toUiProduct(p);
           const desc = base.description ?? makeDescriptionFromRaw(p);
           return {
             ...base,
-            category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+            category: catMap.get(String((p as any).categorie_id)) || base.category || "Catégorie",
             description: desc,
           } as UiProduct & { description?: string };
         });
@@ -244,26 +292,25 @@ useEffect(() => {
       .catch((e) => setError(String(e?.message || e)))
       .finally(() => setLoading(false));
   } else {
-    // Mode groupé: afficher 3 produits par catégorie
-    // MAIS si on recherche, utiliser une seule requête globale
+    // Pas de catégorie sélectionnée
     if (debouncedSearchTerm) {
-      // Recherche globale sans filtre de catégorie
+      // Recherche globale
       const query: ProductQuery = {
         search: debouncedSearchTerm,
         page: 1,
-        limit: 50, // Limite plus élevée pour la recherche
+        limit: 50,
         order: orderParam,
       };
 
       getProducts(query)
         .then((res) => {
-          const rawList = (res.rows as Product[]) || [];
+          const rawList = ((res.rows as Product[]) || []);
           const ui = rawList.map((p) => {
             const base = toUiProduct(p);
             const desc = base.description ?? makeDescriptionFromRaw(p);
             return {
               ...base,
-              category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+              category: catMap.get(String((p as any).categorie_id)) || base.category || "Catégorie",
               description: desc,
             } as UiProduct & { description?: string };
           });
@@ -279,25 +326,22 @@ useEffect(() => {
         .catch((e) => setError(String(e?.message || e)))
         .finally(() => setLoading(false));
     } else {
-      // Mode groupé normal (sans recherche) - Lazy loading optimisé
+      // Mode groupé normal (sans recherche)
       const loadGroupedProducts = async () => {
         try {
           const grouped: Record<string, UiProduct[]> = {};
           const allRaw: Record<string, Product> = {};
-          
-          // Charger seulement les 3 premières catégories initialement
+
           const categoriesToLoad = catOptions
             .filter(opt => opt.id !== "ALL")
-            .slice(0, 3); // Limite à 3 catégories pour le chargement initial
-          
-          // Charger les produits pour les catégories sélectionnées
+            .slice(0, 3);
+
           for (const catOption of categoriesToLoad) {
-            // Vérifier le cache d'abord
             if (categoriesCache[catOption.id]) {
               grouped[catOption.id] = categoriesCache[catOption.id];
               continue;
             }
-            
+
             const query: ProductQuery = {
               page: 1,
               limit: 3,
@@ -306,8 +350,8 @@ useEffect(() => {
             };
 
             const res = await getProducts(query);
-            const rawList = (res.rows as Product[]) || [];
-            
+            const rawList = ((res.rows as Product[]) || []);
+
             if (rawList.length > 0) {
               const ui = rawList.map((p) => {
                 const base = toUiProduct(p);
@@ -315,13 +359,12 @@ useEffect(() => {
                 allRaw[String(p.id)] = p;
                 return {
                   ...base,
-                  category: catMap.get(String(p.categorie_id)) || base.category || "Catégorie",
+                  category: catMap.get(String((p as any).categorie_id)) || base.category || "Catégorie",
                   description: desc,
                 } as UiProduct & { description?: string };
               });
-              
+
               grouped[catOption.id] = ui;
-              // Mettre en cache
               setCategoriesCache(prev => ({ ...prev, [catOption.id]: ui }));
               setLoadedCategories(prev => new Set([...prev, catOption.id]));
             }
@@ -341,7 +384,7 @@ useEffect(() => {
       loadGroupedProducts();
     }
   }
-}, [debouncedSearchTerm, currentPage, orderParam, selectedCatIds, catMap, catOptions]);
+}, [debouncedSearchTerm, currentPage, orderParam, selectedCatIds, catMap, catOptions, multiSelect]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(total / productsPerPage)),
@@ -627,7 +670,14 @@ const loadMoreCategories = async () => {
   const description = product.description ?? "";       // safe
 
   return (
-    <MedicalCard key={product.id} className="h-full flex flex-col">
+    <div
+      key={product.id}
+      className="h-full flex flex-col cursor-pointer"
+      onClick={() => openProductDetails(product.id)}
+      role="button"
+      tabIndex={0}
+    >
+    <MedicalCard className="h-full flex flex-col">
  <div className="relative">
   <div className="aspect-square bg-gray-200 rounded-t-xl flex items-center justify-center overflow-hidden">
   <img
@@ -689,7 +739,8 @@ const loadMoreCategories = async () => {
     variant="primary"
     size="sm"
     className="flex-1"
-    onClick={() => {
+    onClick={(e) => {
+      e.stopPropagation();
       const phone = "+21629380898";
       const message = encodeURIComponent(
         `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
@@ -706,7 +757,7 @@ const loadMoreCategories = async () => {
     variant="outline"
     size="sm"
     className="p-2 w-9 h-9 flex items-center justify-center"
-    onClick={() => openProductDetails(product.id)}
+    onClick={(e) => { e.stopPropagation(); openProductDetails(product.id); }}
     title="Voir les détails du produit"
   >
     <Info className="h-4 w-4" />
@@ -715,6 +766,7 @@ const loadMoreCategories = async () => {
     </div>
   </MedicalCard.Content>
 </MedicalCard>
+</div>
 
   );
 })}
@@ -787,7 +839,14 @@ const loadMoreCategories = async () => {
                         const description = product.description ?? "";
 
                         return (
-                          <MedicalCard key={product.id} className="h-full flex flex-col">
+                          <div
+                            key={product.id}
+                            className="h-full flex flex-col cursor-pointer"
+                            onClick={() => openProductDetails(product.id)}
+                            role="button"
+                            tabIndex={0}
+                          >
+                          <MedicalCard className="h-full flex flex-col">
                             <div className="relative">
                               <div className="aspect-square bg-gray-200 rounded-t-xl flex items-center justify-center overflow-hidden">
                                 <img
@@ -842,7 +901,8 @@ const loadMoreCategories = async () => {
                                     variant="primary"
                                     size="sm"
                                     className="flex-1"
-                                    onClick={() => {
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       const phone = "+21629380898";
                                       const message = encodeURIComponent(
                                         `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
@@ -859,7 +919,7 @@ const loadMoreCategories = async () => {
                                     variant="outline"
                                     size="sm"
                                     className="p-2 w-9 h-9 flex items-center justify-center"
-                                    onClick={() => openProductDetails(product.id)}
+                                    onClick={(e) => { e.stopPropagation(); openProductDetails(product.id); }}
                                     title="Voir les détails du produit"
                                   >
                                     <Info className="h-4 w-4" />
@@ -868,6 +928,7 @@ const loadMoreCategories = async () => {
                               </div>
                             </MedicalCard.Content>
                           </MedicalCard>
+                          </div>
                         );
                       })}
                     </div>

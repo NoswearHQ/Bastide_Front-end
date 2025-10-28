@@ -337,6 +337,14 @@ export async function updateArticle(id: string | number, payload: ArticleUpdate)
   });
 }
 
+// 🔹 Patch d'un article (protégée) - alias pour updateArticle
+export async function patchArticle(id: string | number, payload: Partial<ArticleUpdate>) {
+  return fetchWithAuth<{ ok: true }>(`/crud/articles/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
 // 🔹 Suppression d'un article (protégée)
 export async function deleteArticle(id: string | number) {
   return fetchWithAuth<void>(`/crud/articles/${id}`, { method: "DELETE" });
