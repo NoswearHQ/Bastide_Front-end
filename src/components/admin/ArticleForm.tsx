@@ -51,6 +51,8 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [galleryImages, setGalleryImages] = useState<string[]>([]);
+  const [pendingMainImage, setPendingMainImage] = useState<File | null>(null);
+  const [pendingGalleryImages, setPendingGalleryImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch article for edit mode
@@ -135,43 +137,22 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      try {
-        console.log('🔍 Uploading main image:', file.name);
-        console.log('🔍 Article title:', formData.titre);
-        console.log('🔍 Auth token available:', !!localStorage.getItem('accessToken'));
-        
-        const result = await uploadArticleImages(formData.titre || 'temp', [file]);
-        console.log('🔍 Upload result:', result);
-        
-        if (result.images && result.images.length > 0) {
-          const imagePath = result.images[0];
-          setImagePreview(URL.createObjectURL(file));
-          setFormData(prev => ({ ...prev, image_miniature: imagePath }));
-          toast.success("Image uploadée avec succès");
-        }
-      } catch (error: any) {
-        console.error('Upload error:', error);
-        toast.error(`Erreur lors de l'upload de l'image: ${error.message}`);
-      }
+      // Store the file temporarily instead of uploading immediately
+      setPendingMainImage(file);
+      setImagePreview(URL.createObjectURL(file));
+      toast.success("Image sélectionnée - sera uploadée lors de la sauvegarde");
     }
   };
 
-  const handleGalleryUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    if (files.length === 0) return;
-
-    try {
-      const result = await uploadArticleImages(formData.titre || 'temp', files);
-      if (result.images && result.images.length > 0) {
-        setGalleryImages(prev => [...prev, ...result.images]);
-        toast.success(`${result.images.length} image(s) uploadée(s) avec succès`);
-      }
-    } catch (error: any) {
-      console.error('Upload error:', error);
-      toast.error(`Erreur lors de l'upload des images: ${error.message}`);
+    if (files.length > 0) {
+      // Store the files temporarily instead of uploading immediately
+      setPendingGalleryImages(prev => [...prev, ...files]);
+      toast.success(`${files.length} image(s) sélectionnée(s) - seront uploadées lors de la sauvegarde`);
     }
   };
 
@@ -179,11 +160,22 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
     setGalleryImages(prev => prev.filter((_, i) => i !== index));
   };
 
+  const removePendingGalleryImage = (index: number) => {
+    setPendingGalleryImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const removePendingMainImage = () => {
+    setPendingMainImage(null);
+    setImagePreview(null);
+    setFormData(prev => ({ ...prev, image_miniature: "" }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
     try {
+      // First, create/update the article without images
       const submitData = {
         ...formData,
         galerie_json: galleryImages,
@@ -194,11 +186,50 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
 
       console.log('Submitting article with data:', submitData);
 
+      let articleId: string;
       if (mode === "create") {
-        await createMutation.mutateAsync(submitData);
+        const result = await createMutation.mutateAsync(submitData);
+        articleId = result.id;
       } else {
         await updateMutation.mutateAsync({ id: articleId!, data: submitData });
+        articleId = articleId!;
       }
+
+      // Now upload images if any
+      if (pendingMainImage || pendingGalleryImages.length > 0) {
+        const allPendingFiles = [];
+        if (pendingMainImage) allPendingFiles.push(pendingMainImage);
+        allPendingFiles.push(...pendingGalleryImages);
+
+        try {
+          const uploadResult = await uploadArticleImages(formData.titre, allPendingFiles);
+          
+          // Update the article with the uploaded image paths
+          const updateData: ArticleUpdate = {};
+          
+          if (pendingMainImage && uploadResult.images.length > 0) {
+            updateData.image_miniature = uploadResult.images[0];
+          }
+          
+          if (pendingGalleryImages.length > 0) {
+            const galleryPaths = uploadResult.images.slice(pendingMainImage ? 1 : 0);
+            updateData.galerie_json = [...galleryImages, ...galleryPaths];
+          }
+
+          if (Object.keys(updateData).length > 0) {
+            await updateArticle(articleId, updateData);
+            toast.success("Images uploadées et article mis à jour");
+          }
+        } catch (uploadError) {
+          console.error('Image upload error:', uploadError);
+          toast.error("Article créé mais erreur lors de l'upload des images");
+        }
+      }
+
+      // Clear pending images
+      setPendingMainImage(null);
+      setPendingGalleryImages([]);
+      
     } catch (error) {
       console.error("Submit error:", error);
     } finally {
@@ -409,16 +440,16 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                 {imagePreview && (
                   <div className="flex items-center gap-2">
                     <img
-                      src={safeProductImage(imagePreview)}
+                      src={imagePreview}
                       alt="Preview"
                       className="w-16 h-16 object-cover rounded-lg"
                     />
+                    <div className="text-sm text-gray-600">
+                      {pendingMainImage ? "En attente d'upload" : "Image existante"}
+                    </div>
                     <button
                       type="button"
-                      onClick={() => {
-                        setImagePreview(null);
-                        setFormData(prev => ({ ...prev, image_miniature: "" }));
-                      }}
+                      onClick={removePendingMainImage}
                       className="text-red-600 hover:text-red-700"
                     >
                       <X className="h-4 w-4" />
@@ -449,18 +480,43 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                 Ajouter des images
               </label>
               
-              {galleryImages.length > 0 && (
+              {(galleryImages.length > 0 || pendingGalleryImages.length > 0) && (
                 <div className="grid grid-cols-4 gap-4 mt-4">
+                  {/* Existing gallery images */}
                   {galleryImages.map((image, index) => (
-                    <div key={index} className="relative">
+                    <div key={`existing-${index}`} className="relative">
                       <img
                         src={safeProductImage(image)}
                         alt={`Gallery ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg"
                       />
+                      <div className="absolute top-1 left-1 bg-blue-500 text-white text-xs px-1 rounded">
+                        Existant
+                      </div>
                       <button
                         type="button"
                         onClick={() => removeGalleryImage(index)}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                  
+                  {/* Pending gallery images */}
+                  {pendingGalleryImages.map((file, index) => (
+                    <div key={`pending-${index}`} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={`Pending ${index + 1}`}
+                        className="w-full h-24 object-cover rounded-lg"
+                      />
+                      <div className="absolute top-1 left-1 bg-orange-500 text-white text-xs px-1 rounded">
+                        En attente
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removePendingGalleryImage(index)}
                         className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
                       >
                         <X className="h-3 w-3" />

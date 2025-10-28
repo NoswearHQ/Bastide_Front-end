@@ -356,10 +356,6 @@ export async function uploadArticleImages(titre: string, images: File[]): Promis
     formData.append('images[]', file);
   });
   
-  console.log('🔍 FormData contents:');
-  for (let [key, value] of formData.entries()) {
-    console.log(key, value instanceof File ? `File: ${value.name}` : value);
-  }
   
   return fetchWithAuth<{ message: string; images: string[] }>(`/crud/articles/upload`, {
     method: "POST",
