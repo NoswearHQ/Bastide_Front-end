@@ -5,10 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 
-import Service1Image from "@/assets/s1.jpg";
-import Service2Image from "@/assets/s2.jpg";
-import Service3Image from "@/assets/s4.jpg";
-import Service4Image from "@/assets/s4.png";
+import { safeProductImage } from "@/lib/images";
 
 export default function Services() {
   useEffect(() => {
@@ -50,7 +47,7 @@ export default function Services() {
             {/* Service 1 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={Service1Image}
+                src={safeProductImage("images/s1.jpg")}
                 alt="Location de matériel médical"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
               />
@@ -70,7 +67,7 @@ export default function Services() {
             {/* Service 2 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={Service2Image}
+                src={safeProductImage("images/s2.jpg")}
                 alt="Maintien à domicile"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
               />
@@ -90,7 +87,7 @@ export default function Services() {
             {/* Service 3 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={Service4Image}
+                src={safeProductImage("images/s4.png")}
                 alt="Réseau Bastide Tunisie"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
               />
@@ -110,7 +107,7 @@ export default function Services() {
             {/* Service 4 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={Service3Image}
+                src={safeProductImage("images/s4.jpg")}
                 alt="Service client Bastide"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
               />

@@ -1,27 +1,23 @@
 // src/lib/images.ts
-const ASSET_BASE = (import.meta as any).env.VITE_ASSET_BASE_URL || "";
+const API_BASE = (import.meta as any).env.VITE_API_BASE_URL || "";
 
 /**
- * Retourne l'URL d'une image depuis le chemin en base.
- * - Si le chemin commence par "images/", on redirige vers /src/assets/
- * - Sinon, fallback sur /images/bastidelogo.png
+ * Construit une URL absolue vers le backend public /images à partir d'un chemin relatif
+ * Stockage en base attendu: chemins relatifs type "images/slug/filename.jpg"
  */
 export function imageUrl(pathFromApi?: string | null): string {
-  if (!pathFromApi) return "/images/bastidelogo.png";
+  if (!pathFromApi) return placeholder();
 
-  const normalized = pathFromApi.replace(/^\//, "");
-
-  // ✅ redirige les images vers le dossier frontend "src/assets/"
-  if (normalized.startsWith("images/")) {
-    const localPath = normalized.replace(/^images\//, "");
-    // si tu build avec Vite, le dossier src/assets est déjà exposé
-    return new URL(`../assets/${localPath}`, import.meta.url).href;
+  const trimmed = String(pathFromApi).trim();
+  // Déjà une URL absolue (http/https, blob:, data:)
+  if (/^(https?:)?\/\//.test(trimmed) || trimmed.startsWith("blob:") || trimmed.startsWith("data:")) {
+    return trimmed;
   }
 
-  // ✅ fallback : utilise le CDN si défini dans VITE_ASSET_BASE_URL
-  if (ASSET_BASE) return `${ASSET_BASE.replace(/\/$/, "")}/${normalized}`;
-
-  return `/${normalized}`;
+  const normalized = trimmed.replace(/^\//, "");
+  const encoded = encodeImagePath(normalized);
+  const base = API_BASE.replace(/\/$/, "");
+  return `${base}/${encoded}`;
 }
 
 /**
@@ -44,37 +40,24 @@ export function parseGallery(galerie_json?: string | string[] | null): string[] 
 }
 
 /**
- * Retourne une image produit sécurisée
+ * Retourne une image produit sécurisée (toujours servie par le backend /images)
  */
 export function safeProductImage(imagePath?: string | null): string {
-  if (!imagePath) return "/images/bastidelogo.png";
+  if (!imagePath) return placeholder();
+  return imageUrl(imagePath);
+}
 
-  // ✅ si c'est déjà une URL absolue (http/https), un blob: ou un data:, on la renvoie telle quelle
-  if (/^(https?:)?\/\//.test(imagePath) || imagePath.startsWith("blob:") || imagePath.startsWith("data:")) {
-    return imagePath;
-  }
+function encodeImagePath(path: string): string {
+  // Sépare pour encoder correctement chaque segment sans toucher aux '/'
+  return path
+    .split("/")
+    .map((seg) => encodeURI(seg))
+    .join("/");
+}
 
-  const normalized = imagePath.replace(/^\//, "");
-
-  // ✅ si ça vient du back "images/...", on le sert depuis /public/images
-  if (normalized.startsWith("images/")) {
-    // encode les espaces/accents pour éviter les 404 silencieux
-    const [dir, ...rest] = normalized.split("/");
-    const encoded = [dir, encodeURI(rest.join("/"))].join("/");
-    return `/${encoded}`;
-  }
-
-  // ✅ si tu reçois "src/assets/slug/file", résous via Vite
-  if (normalized.startsWith("src/assets/")) {
-    const localPath = normalized.replace(/^src\//, "");
-    try {
-      return new URL(`../${encodeURI(localPath)}`, import.meta.url).href;
-    } catch {
-      /* ignore */
-    }
-  }
-
-  return "/images/bastidelogo.png";
+function placeholder(): string {
+  const base = API_BASE.replace(/\/$/, "");
+  return `${base}/images/bastidelogo.png`;
 }
 
 
