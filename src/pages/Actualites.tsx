@@ -1,94 +1,32 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Calendar, User, Tag, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import Pagination from "@/components/ui/Pagination";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { MedicalButton } from "@/components/ui/medical-button";
-
-// Mock data pour les articles
-const articles = [
-  {
-    id: 1,
-    title: "Nouveaux protocoles de prévention cardiovasculaire",
-    excerpt: "Découvrez les dernières recommandations en matière de prévention des maladies cardiovasculaires et leur application en pratique clinique.",
-    category: "Cardiologie",
-    author: "Dr. Marie Dubois",
-    date: "2024-03-15",
-    image: "/placeholder-article-1.jpg",
-    featured: true,
-  },
-  {
-    id: 2,
-    title: "L'importance du dépistage précoce en oncologie",
-    excerpt: "Un focus sur les nouvelles techniques de dépistage qui permettent une détection plus précoce des cancers et améliorent le pronostic.",
-    category: "Oncologie",
-    author: "Dr. Jean Martin",
-    date: "2024-03-12",
-    image: "/placeholder-article-2.jpg",
-    featured: false,
-  },
-  {
-    id: 3,
-    title: "Innovations en chirurgie mini-invasive",
-    excerpt: "Les avancées technologiques révolutionnent la chirurgie avec des techniques moins invasives et une récupération plus rapide.",
-    category: "Chirurgie",
-    author: "Dr. Sophie Laurent",
-    date: "2024-03-10",
-    image: "/placeholder-article-3.jpg",
-    featured: false,
-  },
-  {
-    id: 4,
-    title: "Télémédecine : bilan et perspectives",
-    excerpt: "Retour sur l'évolution de la télémédecine post-pandémie et les nouvelles opportunités qu'elle offre pour l'accès aux soins.",
-    category: "Innovation",
-    author: "Dr. Pierre Durand",
-    date: "2024-03-08",
-    image: "/placeholder-article-4.jpg",
-    featured: false,
-  },
-  {
-    id: 5,
-    title: "Prise en charge de la douleur chronique",
-    excerpt: "Approches multidisciplinaires et innovations thérapeutiques dans la gestion de la douleur chronique chez l'adulte.",
-    category: "Algologie",
-    author: "Dr. Anne Moreau",
-    date: "2024-03-05",
-    image: "/placeholder-article-5.jpg",
-    featured: false,
-  },
-  {
-    id: 6,
-    title: "Médecine personnalisée et génomique",
-    excerpt: "Comment la médecine personnalisée transforme les approches thérapeutiques grâce aux avancées en génomique.",
-    category: "Génétique",
-    author: "Dr. Thomas Bernard",
-    date: "2024-03-01",
-    image: "/placeholder-article-6.jpg",
-    featured: false,
-  },
-];
-
-const categories = ["Toutes", "Cardiologie", "Oncologie", "Chirurgie", "Innovation", "Algologie", "Génétique"];
+import { getArticles, type Article } from "@/lib/api";
+import { safeProductImage } from "@/lib/images";
 
 export default function Actualites() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCategory, setSelectedCategory] = useState("Toutes");
   const articlesPerPage = 6;
 
-  // Filtrer les articles par catégorie
-  const filteredArticles = selectedCategory === "Toutes" 
-    ? articles 
-    : articles.filter(article => article.category === selectedCategory);
+  // Fetch articles from API
+  const { data: articlesData, isLoading, error } = useQuery({
+    queryKey: ['articles', currentPage, selectedCategory],
+    queryFn: () => getArticles({ 
+      page: currentPage, 
+      limit: articlesPerPage,
+      search: selectedCategory !== "Toutes" ? selectedCategory : undefined
+    }),
+  });
 
-  // Pagination
-  const totalPages = Math.ceil(filteredArticles.length / articlesPerPage);
-  const currentArticles = filteredArticles.slice(
-    (currentPage - 1) * articlesPerPage,
-    currentPage * articlesPerPage
-  );
+  const articles = articlesData?.rows || [];
+  const totalPages = Math.ceil((articlesData?.total || 0) / articlesPerPage);
 
   const handleCategoryChange = (category: string) => {
     setSelectedCategory(category);
@@ -107,6 +45,52 @@ export default function Actualites() {
       day: 'numeric'
     });
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="py-12">
+          <div className="medical-container">
+            <div className="animate-pulse">
+              <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+              <div className="grid md:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="bg-white rounded-lg shadow">
+                    <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+                    <div className="p-6">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
+                      <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-5/6"></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="py-12">
+          <div className="medical-container">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                Erreur de chargement
+              </h2>
+              <p className="text-gray-600">
+                Impossible de charger les articles. Veuillez réessayer plus tard.
+              </p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -135,19 +119,16 @@ export default function Actualites() {
         <div className="medical-container">
           <div className="flex flex-wrap gap-3">
             <span className="font-medium text-gray-700 self-center">Filtrer par catégorie :</span>
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => handleCategoryChange(category)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
-                  selectedCategory === category
-                    ? "bg-medical-primary text-white"
-                    : "bg-white text-gray-600 hover:bg-gray-100 border"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
+            <button
+              onClick={() => handleCategoryChange("Toutes")}
+              className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 ${
+                selectedCategory === "Toutes"
+                  ? "bg-medical-primary text-white"
+                  : "bg-white text-gray-600 hover:bg-gray-100 border"
+              }`}
+            >
+              Toutes
+            </button>
           </div>
         </div>
       </section>
@@ -155,22 +136,30 @@ export default function Actualites() {
       {/* Articles Section */}
       <section className="medical-section">
         <div className="medical-container">
-          {currentArticles.length > 0 ? (
+          {articles.length > 0 ? (
             <>
               <div className="medical-grid medical-grid--3">
-                {currentArticles.map((article) => (
+                {articles.map((article) => (
                   <MedicalCard key={article.id}>
                     <div className="relative">
-                      <div className="aspect-video bg-gray-200 rounded-t-xl flex items-center justify-center">
-                        <span className="text-gray-500">Image {article.id}</span>
+                      <div className="aspect-video bg-gray-200 rounded-t-xl overflow-hidden">
+                        {article.image_miniature ? (
+                          <img
+                            src={safeProductImage(article.image_miniature)}
+                            alt={article.titre}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/images/bastidelogo.png";
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-gray-500">Pas d'image</span>
+                          </div>
+                        )}
                       </div>
-                      {article.featured && (
-                        <div className="absolute top-4 left-4 bg-medical-accent text-white px-3 py-1 rounded-full text-sm font-medium">
-                          À la une
-                        </div>
-                      )}
                       <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-medium">
-                        {article.category}
+                        Article
                       </div>
                     </div>
                     
@@ -179,31 +168,38 @@ export default function Actualites() {
                         <div className="flex items-center space-x-4 text-sm text-gray-500">
                           <div className="flex items-center space-x-1">
                             <Calendar className="h-4 w-4" />
-                            <span>{formatDate(article.date)}</span>
+                            <span>
+                              {article.publie_le 
+                                ? formatDate(article.publie_le)
+                                : formatDate(article.cree_le)
+                              }
+                            </span>
                           </div>
-                          <div className="flex items-center space-x-1">
-                            <User className="h-4 w-4" />
-                            <span>{article.author}</span>
-                          </div>
+                          {article.nom_auteur && (
+                            <div className="flex items-center space-x-1">
+                              <User className="h-4 w-4" />
+                              <span>{article.nom_auteur}</span>
+                            </div>
+                          )}
                         </div>
                       </MedicalCard.Meta>
                       
                       <MedicalCard.Title>
                         <Link 
-                          to={`/actualites/${article.id}`}
+                          to={`/articles/${article.slug}`}
                           className="hover:text-medical-primary transition-colors"
                         >
-                          {article.title}
+                          {article.titre}
                         </Link>
                       </MedicalCard.Title>
                       
                       <MedicalCard.Description>
-                        {article.excerpt}
+                        {article.extrait || "Aucun extrait disponible"}
                       </MedicalCard.Description>
                       
                       <div className="mt-4">
                         <MedicalButton variant="outline" size="sm" asChild>
-                          <Link to={`/actualites/${article.id}`}>
+                          <Link to={`/articles/${article.slug}`}>
                             Lire la suite
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
@@ -234,14 +230,8 @@ export default function Actualites() {
                 Aucun article trouvé
               </h3>
               <p className="text-gray-600 mb-6">
-                Aucun article ne correspond à la catégorie sélectionnée.
+                Aucun article publié pour le moment.
               </p>
-              <MedicalButton 
-                variant="primary"
-                onClick={() => handleCategoryChange("Toutes")}
-              >
-                Voir tous les articles
-              </MedicalButton>
             </div>
           )}
         </div>

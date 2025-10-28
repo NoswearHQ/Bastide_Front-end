@@ -18,7 +18,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { getArticleBySlug, getArticles, type Article } from "@/lib/api";
-import { parseGallery } from "@/lib/images";
+import { parseGallery, safeProductImage } from "@/lib/images";
 
 export default function ArticleDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -183,9 +183,12 @@ export default function ArticleDetail() {
               {article.image_miniature && (
                 <div className="aspect-video bg-gray-200">
                   <img
-                    src={article.image_miniature}
+                    src={safeProductImage(article.image_miniature)}
                     alt={article.titre}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = "/images/bastidelogo.png";
+                    }}
                   />
                 </div>
               )}
@@ -275,9 +278,12 @@ export default function ArticleDetail() {
                       {galleryImages.map((image, index) => (
                         <div key={index} className="aspect-square bg-gray-200 rounded-lg overflow-hidden">
                           <img
-                            src={image}
+                            src={safeProductImage(image)}
                             alt={`Galerie ${index + 1}`}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                            onError={(e) => {
+                              e.currentTarget.src = "/images/bastidelogo.png";
+                            }}
                           />
                         </div>
                       ))}
@@ -297,9 +303,12 @@ export default function ArticleDetail() {
                       {relatedArticle.image_miniature && (
                         <div className="aspect-video bg-gray-200 rounded-t-xl overflow-hidden">
                           <img
-                            src={relatedArticle.image_miniature}
+                            src={safeProductImage(relatedArticle.image_miniature)}
                             alt={relatedArticle.titre}
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.src = "/images/bastidelogo.png";
+                            }}
                           />
                         </div>
                       )}
