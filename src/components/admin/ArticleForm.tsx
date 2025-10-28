@@ -22,6 +22,7 @@ import {
   type ArticleCreate, 
   type ArticleUpdate 
 } from "@/lib/api";
+import { safeProductImage } from "@/lib/images";
 import { toast } from "sonner";
 
 interface ArticleFormProps {
@@ -91,28 +92,12 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
       });
 
       if (existingArticle.image_miniature) {
-        // Check if it's a base64 data URL or a filename
-        if (existingArticle.image_miniature.startsWith('data:')) {
-          setImagePreview(existingArticle.image_miniature);
-        } else {
-          // It's a filename, we need to construct the full URL
-          const imageUrl = `${import.meta.env.VITE_API_BASE_URL}/images/articles/${existingArticle.slug}/${existingArticle.image_miniature}`;
-          setImagePreview(imageUrl);
-        }
+        setImagePreview(existingArticle.image_miniature);
       }
 
       if (existingArticle.galerie_json) {
         const gallery = Array.isArray(existingArticle.galerie_json) ? existingArticle.galerie_json : [];
-        // Check if images are base64 data URLs or filenames
-        const processedGallery = gallery.map(img => {
-          if (img.startsWith('data:')) {
-            return img;
-          } else {
-            // It's a filename, construct the full URL
-            return `${import.meta.env.VITE_API_BASE_URL}/images/articles/${existingArticle.slug}/${img}`;
-          }
-        });
-        setGalleryImages(processedGallery);
+        setGalleryImages(gallery);
       }
     }
   }, [existingArticle, mode]);
@@ -401,7 +386,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                 {imagePreview && (
                   <div className="flex items-center gap-2">
                     <img
-                      src={imagePreview.startsWith('data:') ? imagePreview : `${import.meta.env.VITE_API_BASE_URL}/${imagePreview}`}
+                      src={safeProductImage(imagePreview)}
                       alt="Preview"
                       className="w-16 h-16 object-cover rounded-lg"
                     />
@@ -446,7 +431,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                   {galleryImages.map((image, index) => (
                     <div key={index} className="relative">
                       <img
-                        src={image.startsWith('data:') ? image : `${import.meta.env.VITE_API_BASE_URL}/${image}`}
+                        src={safeProductImage(image)}
                         alt={`Gallery ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg"
                       />
