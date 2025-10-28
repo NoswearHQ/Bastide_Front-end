@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
+import Seo from "@/components/Seo";
 
 import { safeProductImage } from "@/lib/images";
 
@@ -14,6 +15,12 @@ export default function Services() {
 
   return (
     <Layout>
+      <Seo
+        title="Services Bastide Tunisie — Maintien à domicile, assistance"
+        description="Installation à domicile, conseil par nos experts, astreinte 24/7, livraison rapide. Découvrez nos services Bastide en Tunisie."
+        canonical="https://bastide.tn/services"
+        image={safeProductImage("images/bastidelogo.png")}
+      />
       {/* Hero Section */}
       <section className="bg-gradient-primary text-white py-16">
         <div className="medical-container">
