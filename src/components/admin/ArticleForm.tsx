@@ -152,23 +152,20 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // For now, just store the filename instead of base64
+      // Store the full path that matches the backend structure
       const fileName = file.name;
+      const slug = formData.slug || 'temp-slug';
+      const fullPath = `images/articles/${slug}/${fileName}`;
       setImagePreview(URL.createObjectURL(file));
-      setFormData(prev => ({ ...prev, image_miniature: fileName }));
+      setFormData(prev => ({ ...prev, image_miniature: fullPath }));
     }
   };
 
   const handleGalleryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setGalleryImages(prev => [...prev, result]);
-      };
-      reader.readAsDataURL(file);
-    });
+    const slug = formData.slug || 'temp-slug';
+    const fileNames = files.map(file => `images/articles/${slug}/${file.name}`);
+    setGalleryImages(prev => [...prev, ...fileNames]);
   };
 
   const removeGalleryImage = (index: number) => {
@@ -404,7 +401,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                 {imagePreview && (
                   <div className="flex items-center gap-2">
                     <img
-                      src={imagePreview}
+                      src={imagePreview.startsWith('data:') ? imagePreview : `${import.meta.env.VITE_API_BASE_URL}/${imagePreview}`}
                       alt="Preview"
                       className="w-16 h-16 object-cover rounded-lg"
                     />
@@ -449,7 +446,7 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
                   {galleryImages.map((image, index) => (
                     <div key={index} className="relative">
                       <img
-                        src={image}
+                        src={image.startsWith('data:') ? image : `${import.meta.env.VITE_API_BASE_URL}/${image}`}
                         alt={`Gallery ${index + 1}`}
                         className="w-full h-24 object-cover rounded-lg"
                       />

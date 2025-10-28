@@ -48,6 +48,7 @@ export default function ArticleDetail() {
     }
   }, [articlesData, article]);
 
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
       year: 'numeric',
