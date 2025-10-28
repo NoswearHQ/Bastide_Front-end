@@ -77,9 +77,13 @@ export default function LocationMateriel() {
           {/* Image à droite */}
           <div className="rounded-2xl overflow-hidden shadow-lg">
             <img
-              src={safeProductImage("images/LocationImage.jpg")}
+              src={safeProductImage("images/LocationImage.webp")}
               alt="Location de matériel médical"
               className="w-full h-full object-cover"
+              width={752}
+              height={500}
+              loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
@@ -227,9 +231,11 @@ export default function LocationMateriel() {
             {/* Image à droite */}
             <div className="rounded-2xl overflow-hidden shadow-md">
               <img
-                src={safeProductImage("images/vieil-homme-dans-une-maison-de-soins-infirmiers-fist-bumping-infirmiere.jpg")}
+                src={safeProductImage("images/vieil-homme-dans-une-maison-de-soins-infirmiers-fist-bumping-infirmiere.webp")}
                 alt="Nos agents Bastide Tunisie"
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
               />
             </div>
           </div>
