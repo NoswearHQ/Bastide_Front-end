@@ -201,29 +201,41 @@ export default function ArticleForm({ articleId, mode }: ArticleFormProps) {
         if (pendingMainImage) allPendingFiles.push(pendingMainImage);
         allPendingFiles.push(...pendingGalleryImages);
 
+        console.log('🔍 Uploading images for article:', articleId);
+        console.log('🔍 Pending files:', allPendingFiles.map(f => f.name));
+        console.log('🔍 Article title:', formData.titre);
+
         try {
           const uploadResult = await uploadArticleImages(formData.titre, allPendingFiles);
+          console.log('🔍 Upload result:', uploadResult);
           
           // Update the article with the uploaded image paths
           const updateData: ArticleUpdate = {};
           
           if (pendingMainImage && uploadResult.images.length > 0) {
             updateData.image_miniature = uploadResult.images[0];
+            console.log('🔍 Setting main image:', updateData.image_miniature);
           }
           
           if (pendingGalleryImages.length > 0) {
             const galleryPaths = uploadResult.images.slice(pendingMainImage ? 1 : 0);
             updateData.galerie_json = [...galleryImages, ...galleryPaths];
+            console.log('🔍 Setting gallery images:', updateData.galerie_json);
           }
 
           if (Object.keys(updateData).length > 0) {
+            console.log('🔍 Updating article with data:', updateData);
             await updateArticle(articleId, updateData);
             toast.success("Images uploadées et article mis à jour");
+          } else {
+            console.log('🔍 No update data to send');
           }
         } catch (uploadError) {
           console.error('Image upload error:', uploadError);
           toast.error("Article créé mais erreur lors de l'upload des images");
         }
+      } else {
+        console.log('🔍 No pending images to upload');
       }
 
       // Clear pending images

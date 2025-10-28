@@ -183,7 +183,9 @@ export default function ArticleDetail() {
               {/* Main Image */}
               <div className="aspect-video bg-gray-200">
                 <img
-                  src={article.image_miniature ? safeProductImage(article.image_miniature) : "https://api.bastide.com.tn/images/bastidelogo.png"}
+                  src={article.image_miniature && article.image_miniature.trim() !== '' 
+                    ? safeProductImage(article.image_miniature) 
+                    : "https://api.bastide.com.tn/images/bastidelogo.png"}
                   alt={article.titre}
                   className="w-full h-full object-cover"
                     onError={(e) => {
