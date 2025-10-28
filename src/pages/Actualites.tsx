@@ -149,36 +149,7 @@ export default function Actualites() {
             {/* Articles Section */}
             <section className="medical-section">
               <div className="medical-container">
-                {/* Test Image Debug */}
-                <div className="mb-8 p-4 bg-yellow-100 border border-yellow-300 rounded">
-                  <h3 className="font-bold mb-2">🧪 Image URL Test:</h3>
-                  <p>API_BASE: {(import.meta as any).env.VITE_API_BASE_URL || 'NOT_SET'}</p>
-                  <p>Test URL 1: {safeProductImage('images/s4.png')}</p>
-                  <p>Test URL 2: {safeProductImage('images/boutique2.jpeg')}</p>
-                  <div className="flex gap-4 mt-2">
-                    <img 
-                      src={safeProductImage('images/s4.png')} 
-                      alt="Test 1" 
-                      className="w-32 h-24 object-cover border border-gray-300"
-                      onLoad={() => console.log('✅ Test image 1 loaded successfully')}
-                      onError={(e) => console.log('❌ Test image 1 failed to load:', e.currentTarget.src)}
-                    />
-                    <img 
-                      src={safeProductImage('images/boutique2.jpeg')} 
-                      alt="Test 2" 
-                      className="w-32 h-24 object-cover border border-gray-300"
-                      onLoad={() => console.log('✅ Test image 2 loaded successfully')}
-                      onError={(e) => console.log('❌ Test image 2 failed to load:', e.currentTarget.src)}
-                    />
-                    <img 
-                      src="https://api.bastide.com.tn/images/bastidelogo.png" 
-                      alt="Test 3" 
-                      className="w-32 h-24 object-cover border border-gray-300"
-                      onLoad={() => console.log('✅ Test image 3 (logo) loaded successfully')}
-                      onError={(e) => console.log('❌ Test image 3 (logo) failed to load:', e.currentTarget.src)}
-                    />
-                  </div>
-                </div>
+                
 
                 {articles.length > 0 ? (
                   <>
