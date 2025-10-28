@@ -187,7 +187,11 @@ export default function ArticleDetail() {
                     alt={article.titre}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = "/images/bastidelogo.png";
+                      // Prevent infinite loop by checking if already set to fallback
+                      if (!e.currentTarget.src.includes('data:image')) {
+                        // Use a simple data URI placeholder instead of external image
+                        e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
+                      }
                     }}
                   />
                 </div>
@@ -282,7 +286,11 @@ export default function ArticleDetail() {
                             alt={`Galerie ${index + 1}`}
                             className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                             onError={(e) => {
-                              e.currentTarget.src = "/images/bastidelogo.png";
+                              // Prevent infinite loop by checking if already set to fallback
+                              if (!e.currentTarget.src.includes('data:image')) {
+                                // Use a simple data URI placeholder instead of external image
+                                e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
+                              }
                             }}
                           />
                         </div>
@@ -307,7 +315,11 @@ export default function ArticleDetail() {
                             alt={relatedArticle.titre}
                             className="w-full h-full object-cover"
                             onError={(e) => {
-                              e.currentTarget.src = "/images/bastidelogo.png";
+                              // Prevent infinite loop by checking if already set to fallback
+                              if (!e.currentTarget.src.includes('data:image')) {
+                                // Use a simple data URI placeholder instead of external image
+                                e.currentTarget.src = "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNzUgMTI1SDIyNVYxNzVIMTc1VjEyNVoiIGZpbGw9IiM5Q0EzQUYiLz4KPHN2Zz4K";
+                              }
                             }}
                           />
                         </div>
