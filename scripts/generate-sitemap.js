@@ -6,7 +6,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const API_BASE = process.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000';
+const API_BASE = process.env.VITE_API_BASE_URL || 'https://api.bastide.com.tn';
 const SITE_BASE = 'https://bastide.tn';
 
 // URLs statiques qui seront toujours dans le sitemap
