@@ -20,5 +20,25 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://bastide.tn/actualites</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bastide.tn/engagements</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://bastide.tn/catalogue</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+   <url>
+    <loc>https://bastide.tn/contact</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
 
