@@ -58,3 +58,23 @@
 .read-the-docs {
   color: #888;
 }
+
+.prose table {
+  width: 100%;
+  overflow-x: auto;
+  display: block;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(49, 56, 78, 0.04);
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+}
+.prose th, .prose td {
+  padding: 0.75rem 1rem;
+}
+.prose th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+}
+.prose tr {
+  border-bottom: 1px solid #e5e7eb;
+}

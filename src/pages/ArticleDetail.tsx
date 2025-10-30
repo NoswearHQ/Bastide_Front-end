@@ -271,7 +271,7 @@ export default function ArticleDetail() {
 
                 {/* Article Content */}
                 <div 
-                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-medical-primary prose-strong:text-gray-900 prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:mx-auto prose-img:my-4 prose-p:my-4 prose-li:my-2 prose-ul:pl-6 prose-ol:pl-6 prose-table:my-4 prose-blockquote:my-4 prose-blockquote:pl-4 prose-blockquote:border-l-4 prose-blockquote:border-medical-primary prose-blockquote:bg-gray-50 prose-blockquote:text-gray-700 prose-blockquote:italic prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded"
+                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-medical-primary prose-strong:text-gray-900 prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:mx-auto prose-img:my-4 prose-p:my-4 prose-li:my-2 prose-ul:pl-6 prose-ol:pl-6 prose-table:w-full prose-table:overflow-auto prose-th:bg-gray-100 prose-th:font-semibold prose-td:p-2 prose-th:p-2 prose-tr:border-b prose-table:rounded-xl prose-table:shadow-sm prose-table:mb-8 prose-table:mt-4 prose-blockquote:my-4 prose-blockquote:pl-4 prose-blockquote:border-l-4 prose-blockquote:border-medical-primary prose-blockquote:bg-gray-50 prose-blockquote:text-gray-700 prose-blockquote:italic prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded"
                   style={{lineHeight: 1.75, fontSize: '1.18rem'}}
                   dangerouslySetInnerHTML={{ __html: article.contenu_html }}
                 />
@@ -352,7 +352,7 @@ export default function ArticleDetail() {
                         
                         {relatedArticle.extrait && (
                           <MedicalCard.Description>
-                            {relatedArticle.extrait}
+                            <span className="line-clamp-3 clamp-3">{relatedArticle.extrait}</span>
                           </MedicalCard.Description>
                         )}
                         
