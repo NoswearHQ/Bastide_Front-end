@@ -40,5 +40,20 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
+  <url>
+    <loc>https://bastide.tn/articles/bas-de-contention-quelle-classe-choisir-1-2-ou-3-le-guide-complet-2</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bastide.tn/articles/le-guide-ultime-pour-choisir-sa-mati-re-de-linge-de-lit-coton-lin-satin-et-plus-encore</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bastide.tn/articles/quel-linge-de-lit-choisir-pour-un-usage-quotidien-occasionnel-ou-pour-un-enfant</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>
 
