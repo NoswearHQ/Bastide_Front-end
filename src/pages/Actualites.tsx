@@ -209,7 +209,7 @@ export default function Actualites() {
                       </MedicalCard.Title>
                       
                       <MedicalCard.Description>
-                        {article.extrait || "Aucun extrait disponible"}
+                        <span className="line-clamp-3 clamp-3">{article.extrait || "Aucun extrait disponible"}</span>
                       </MedicalCard.Description>
                       
                       <div className="mt-4">

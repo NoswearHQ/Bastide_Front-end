@@ -210,10 +210,11 @@ export default function ArticleDetail() {
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {article.publie_le 
+                      {article.publie_le && !isNaN(Date.parse(article.publie_le))
                         ? formatDate(article.publie_le)
-                        : formatDate(article.cree_le)
-                      }
+                        : article.cree_le && !isNaN(Date.parse(article.cree_le))
+                          ? formatDate(article.cree_le)
+                          : 'Date inconnue'}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -236,7 +237,6 @@ export default function ArticleDetail() {
 
                 {/* Share Buttons */}
                 <div className="flex items-center gap-4 mb-8 p-4 bg-gray-50 rounded-lg">
-                  <span className="text-sm font-medium text-gray-700">Partager :</span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => handleShare('facebook')}
@@ -271,7 +271,8 @@ export default function ArticleDetail() {
 
                 {/* Article Content */}
                 <div 
-                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-medical-primary prose-strong:text-gray-900"
+                  className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-medical-primary prose-strong:text-gray-900 prose-img:rounded-lg prose-img:max-w-full prose-img:h-auto prose-img:mx-auto prose-img:my-4 prose-p:my-4 prose-li:my-2 prose-ul:pl-6 prose-ol:pl-6 prose-table:my-4 prose-blockquote:my-4 prose-blockquote:pl-4 prose-blockquote:border-l-4 prose-blockquote:border-medical-primary prose-blockquote:bg-gray-50 prose-blockquote:text-gray-700 prose-blockquote:italic prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded"
+                  style={{lineHeight: 1.75, fontSize: '1.18rem'}}
                   dangerouslySetInnerHTML={{ __html: article.contenu_html }}
                 />
 
