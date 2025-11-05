@@ -50,15 +50,21 @@ const features = [
 
 const testimonials = [
   {
-    name: "Marie Dubois",
-    role: "Patiente",
-    content: "Un service exceptionnel avec une équipe à l'écoute. Je recommande vivement cette structure médicale.",
+    name: "Client",
+    role: "Acheteur",
+    content: "السلام عليكم وصلتني الcommande يعطيكم الف صحة وفررررحة ❤️ و livreur ياسر متربي ويرحم والديكم و و والديه très organisé en plus ponctuel  وأن شاء الله نزيد نتعامل معاكم وحكيت عليكم للfamille باش يدخلو",
     rating: 5,
   },
   {
-    name: "Jean Martin", 
-    role: "Patient",
-    content: "Professionnalisme et bienveillance caractérisent cette équipe. Des soins de qualité dans un cadre moderne.",
+    name: "Client",
+    role: "Acheteur",
+    content: "Merci beaucoup ❤️❤️❤️ pour votre gentillesse je vous souhaite une excellente journée ❤️❤️",
+    rating: 5,
+  },
+  {
+    name: "Client",
+    role: "Acheteur",
+    content: "je voulais vous remercier pour tout ce que vous avez fait . impeccable 👌",
     rating: 5,
   },
 ];
