@@ -25,7 +25,7 @@ export default function Header() {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <img 
-                src="/lovable-uploads/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
+                src="/logo/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
                 alt="Bastide - Le confort médical" 
                 className="h-12 w-auto"
               />

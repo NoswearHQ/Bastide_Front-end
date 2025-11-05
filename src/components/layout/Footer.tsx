@@ -35,7 +35,7 @@ export default function Footer() {
             <div className="lg:col-span-1">
   <div className="flex items-center space-x-2 mb-6">
     <img 
-      src="/lovable-uploads/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
+      src="/logo/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
       alt="Bastide Tunisie - Le confort médical" 
       style={{ width: "110px", height: "55px" }}
     />
