@@ -102,7 +102,7 @@ export default function Services() {
             {/* Service 3 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
-                src={safeProductImage("images/s4.webp")}
+                src={safeProductImage("images/s3.webp")}
                 alt="Réseau Bastide Tunisie"
                 className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
                 width={569}

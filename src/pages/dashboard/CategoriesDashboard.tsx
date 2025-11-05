@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { Pencil, Trash2, Plus, Upload, CheckCircle } from "lucide-react";
@@ -209,13 +210,13 @@ export default function CategoriesDashboard() {
                       </button>
                     </td>
                     <td className="py-3 px-4 text-center space-x-2">
-                      <button
-                        onClick={() => alert("Édition à venir")}
-                        className="px-3 py-1 text-blue-600 hover:underline"
+                      <Link
+                        to={`/dashboard/categories/modifier/${cat.id}`}
+                        className="inline-flex items-center px-3 py-1 text-blue-600 hover:underline"
                       >
                         <Pencil className="inline-block h-4 w-4 mr-1" />
                         Modifier
-                      </button>
+                      </Link>
                       <button
                         onClick={() => handleDelete(cat.id)}
                         className="px-3 py-1 text-red-600 hover:underline"

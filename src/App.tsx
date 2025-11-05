@@ -30,6 +30,7 @@ import ArticlesAdmin from "./pages/dashboard/ArticlesAdmin";
 import ArticleCreate from "./pages/dashboard/ArticleCreate";
 import ArticleEdit from "./pages/dashboard/ArticleEdit";
 import ArticleDetail from "./pages/ArticleDetail";
+import ModifierCategorie from "./pages/dashboard/ModifierCategorie";
 
 const queryClient = new QueryClient();
 
@@ -104,6 +105,14 @@ const App = () => (
   element={
     <PrivateRoute>
       <CategoriesDashboard />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/dashboard/categories/modifier/:id"
+  element={
+    <PrivateRoute>
+      <ModifierCategorie />
     </PrivateRoute>
   }
 />
