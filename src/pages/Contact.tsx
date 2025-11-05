@@ -292,28 +292,13 @@ export default function Contact() {
               </form>
             </div>
 
-            {/* Contact Info */}
+              {/* Contact Info */}
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">
                 Informations de contact
               </h2>
 
-              {/* Address */}
               <div className="space-y-8">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-medical-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="h-6 w-6 text-medical-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">Adresse</h3>
-                    <p className="text-gray-600">
-                      {contactInfo.address.street}<br />
-                      {contactInfo.address.city}<br />
-                      {contactInfo.address.country}
-                    </p>
-                  </div>
-                </div>
-
                 {/* Phone */}
                 <div className="flex items-start space-x-4">
                   <div className="w-12 h-12 bg-medical-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -321,6 +306,9 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Téléphone</h3>
+                    <p className="text-gray-600 mb-1">
+                      Téléphone fixe : 71 947 353
+                    </p>
                     <p className="text-gray-600">
                       Urgences : {contactInfo.emergency}
                     </p>
@@ -345,11 +333,18 @@ export default function Contact() {
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2">Horaires</h3>
-                    <div className="text-gray-600 space-y-1">
-                      <p>{contactInfo.hours.weekdays}</p>
-                      <p>{contactInfo.hours.saturday}</p>
-                      <p>{contactInfo.hours.sunday}</p>
-                      <p className="font-medium text-medical-accent">
+                    <div className="text-gray-600 space-y-2">
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">Lundi - Vendredi :</p>
+                        <p>Centre Urbain Nord — De 8h à 18h</p>
+                        <p>Aouina — De 8h à 20h</p>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900 mb-1">Samedi :</p>
+                        <p>Centre Urbain Nord — 8h à 14h</p>
+                        <p>Aouina — 8h à 20h</p>
+                      </div>
+                      <p className="font-medium text-medical-accent mt-3">
                         {contactInfo.hours.emergency}
                       </p>
                     </div>

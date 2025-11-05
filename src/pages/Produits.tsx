@@ -115,7 +115,7 @@ export default function Produits() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searching, setSearching] = useState(false);
-  const multiSelect = selectedCatIds.length > 1;
+  // Single category selection only - removed multiSelect
   
   // Grouped products for display when no category selected
   const [groupedProducts, setGroupedProducts] = useState<Record<string, UiProduct[]>>({});
@@ -195,7 +195,8 @@ useEffect(() => {
 // ✅ Hydrater l'état depuis l'URL (TOP-LEVEL, pas imbriqué !)
 useEffect(() => {
   const catParam = params.get("categoryId");
-  const cats = catParam ? catParam.split(',').filter(Boolean) : [];
+  // Single category selection: take only the first category if multiple provided
+  const cats = catParam ? [catParam.split(',')[0]].filter(Boolean) : [];
   const sort = params.get("sort") ?? "name";
   const qParam = params.get("q") ?? "";
   const p = Number(params.get("page") || 1);
@@ -212,54 +213,7 @@ useEffect(() => {
   setError(null);
 
   if (selectedCatIds.length > 0) {
-    // --- MULTI-CATÉGORIES: union des résultats
-    if (multiSelect) {
-      const limitPerCat = productsPerPage;
-      Promise.all(
-        selectedCatIds.map((catId) =>
-          getProducts({
-            search: debouncedSearchTerm || undefined,
-            page: 1,
-            limit: limitPerCat,
-            order: orderParam,
-            categoryId: catId,
-          })
-        )
-      )
-        .then((responses) => {
-          const merged: Record<string, Product> = {};
-          responses.forEach((res) => {
-            const list = (res.rows as Product[]) || [];
-            list.forEach((p) => {
-              merged[String(p.id)] = p;
-            });
-          });
-
-          const uniqueRaw = Object.values(merged);
-          const ui = uniqueRaw.map((p) => {
-            const base = toUiProduct(p);
-            const desc = base.description ?? makeDescriptionFromRaw(p);
-            return {
-              ...base,
-              category: catMap.get(String((p as any).categorie_id)) || base.category || "Catégorie",
-              description: desc,
-            } as UiProduct & { description?: string };
-          });
-
-          const idx: Record<string, Product> = {};
-          uniqueRaw.forEach((p) => (idx[String(p.id)] = p));
-
-          setRows(ui);
-          setRawById(idx);
-          setTotal(ui.length);
-          setGroupedProducts({});
-        })
-        .catch((e) => setError(String(e?.message || e)))
-        .finally(() => setLoading(false));
-      return;
-    }
-
-    // Mono-catégorie classique avec pagination
+    // Single category selection only
     const query: ProductQuery = {
       search: debouncedSearchTerm || undefined,
       page: currentPage,
@@ -384,7 +338,7 @@ useEffect(() => {
       loadGroupedProducts();
     }
   }
-}, [debouncedSearchTerm, currentPage, orderParam, selectedCatIds, catMap, catOptions, multiSelect]);
+}, [debouncedSearchTerm, currentPage, orderParam, selectedCatIds, catMap, catOptions]);
 
   const totalPages = useMemo(
     () => Math.max(1, Math.ceil(total / productsPerPage)),
@@ -398,7 +352,8 @@ function updateUrl(partial: { categoryIds?: string[]; sort?: string; q?: string;
     if (partial.categoryIds.length === 0) {
       next.delete("categoryId");
     } else {
-      next.set("categoryId", partial.categoryIds.join(','));
+      // Single category selection: only use the first category
+      next.set("categoryId", partial.categoryIds[0]);
     }
     next.delete("page");
   }
@@ -421,10 +376,11 @@ function updateUrl(partial: { categoryIds?: string[]; sort?: string; q?: string;
 }
 
 const handleCategoryToggle = (categoryId: string) => {
+  // Single category selection: if clicking the same category, deselect it; otherwise, select only this one
   setSelectedCatIds(prev => {
     const newIds = prev.includes(categoryId) 
-      ? prev.filter(id => id !== categoryId)
-      : [...prev, categoryId];
+      ? [] // Deselect if already selected
+      : [categoryId]; // Select only this category (single selection)
     setCurrentPage(1);
     updateUrl({ categoryIds: newIds });
     return newIds;
@@ -432,9 +388,11 @@ const handleCategoryToggle = (categoryId: string) => {
 };
 
 const handleCategorySelect = (categoryId: string) => {
-  setSelectedCatIds([categoryId]);
+  // If empty string, deselect; otherwise select only this category
+  const newIds = categoryId ? [categoryId] : [];
+  setSelectedCatIds(newIds);
   setCurrentPage(1);
-  updateUrl({ categoryIds: [categoryId] });
+  updateUrl({ categoryIds: newIds });
   window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
@@ -604,7 +562,7 @@ const loadMoreCategories = async () => {
               {catOptions.filter(opt => opt.id !== "ALL").map((option) => (
                 <button
                   key={option.id}
-                  onClick={() => handleCategoryToggle(option.id)}
+                  onClick={() => handleCategorySelect(option.id)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                     selectedCatIds.includes(option.id)
                       ? "bg-medical-primary text-white shadow-md"
@@ -619,17 +577,17 @@ const loadMoreCategories = async () => {
 
           {/* Active Filters */}
           <div className="mt-4 flex flex-wrap gap-2">
-            {selectedCatIds.map((catId) => (
-              <span key={catId} className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-medical-primary text-white">
-                {catMap.get(catId) || "Catégorie"}
+            {selectedCatIds.length > 0 && (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-medical-primary text-white">
+                {catMap.get(selectedCatIds[0]) || "Catégorie"}
                 <button 
-                  onClick={() => handleCategoryToggle(catId)} 
+                  onClick={() => handleCategorySelect("")} 
                   className="ml-2 hover:text-gray-200"
                 >
                   ×
                 </button>
               </span>
-            ))}
+            )}
             {searchTerm && (
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-200 text-gray-700">
                 "{searchTerm}"

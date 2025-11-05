@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { getCategories, type Category } from "@/lib/api";
 import CategoryPillarsDynamic from "@/components/catalog/CategoryPillarsDynamic";
 import Seo from "@/components/Seo";
+import ProductSearchBar from "@/components/search/ProductSearchBar";
 
 const PillarCard = ({ title, categoryId }: { title: string; categoryId: string }) => (
   <Link
@@ -115,6 +116,13 @@ export default function Home() {
       type="website"
     />
     <div>
+      {/* Product Search Bar Section */}
+      <section className="pt-12 pb-6 bg-white border-b border-gray-200">
+        <div className="medical-container">
+          <ProductSearchBar />
+        </div>
+      </section>
+
       {/* Hero Section */}
       <section className="medical-hero">
   <div className="medical-container relative z-10">
@@ -304,7 +312,7 @@ export default function Home() {
       {/* Service 3 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <img
-          src={safeProductImage("images/s4.webp")}
+          src={safeProductImage("images/s3.webp")}
           alt="Réseau Bastide"
           className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
           width={569}

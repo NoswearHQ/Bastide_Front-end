@@ -27,19 +27,19 @@ export default function Header() {
               <img 
                 src="/logo/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
                 alt="Bastide - Le confort médical" 
-                className="h-12 w-auto"
+                className="h-16 w-auto"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8" aria-label="Navigation principale">
+          <nav className="hidden md:flex items-center space-x-10" aria-label="Navigation principale">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-gray-600 hover:text-gray-900 transition-colors duration-300 font-medium",
+                  "text-base text-gray-600 hover:text-gray-900 transition-colors duration-300 font-medium px-3 py-2",
                   location.pathname === item.href && "text-medical-primary font-semibold"
                 )}
               >
@@ -74,7 +74,7 @@ export default function Header() {
                   key={item.name}
                   to={item.href}
                   className={cn(
-                    "block px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-300",
+                    "block px-4 py-3 text-base text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium",
                     location.pathname === item.href && "text-medical-primary bg-gray-50 font-semibold"
                   )}
                   onClick={() => setMobileMenuOpen(false)}
