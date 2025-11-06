@@ -56,7 +56,7 @@ export default function ProductSearchBar() {
     if (!price) return "Prix sur demande";
     const numPrice = parseFloat(price);
     if (isNaN(numPrice)) return "Prix sur demande";
-    return `${numPrice.toFixed(2)} ${devise}`;
+    return `${numPrice.toFixed(2)} DT`;
   };
 
   const handleClear = () => {

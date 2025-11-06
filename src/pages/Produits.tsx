@@ -83,7 +83,7 @@ function makeDescriptionFromRaw(p?: Product): string | undefined {
 function buildFeatures(p?: Product): string[] {
   if (!p) return [];
   const out: string[] = [];
-  if (p.prix && p.devise) out.push(`Prix : ${p.prix}${p.devise === "EUR" ? "€" : ` ${p.devise}`}`);
+  if (p.prix) out.push(`Prix : ${p.prix} DT`);
   return out;
 }
 
@@ -855,11 +855,13 @@ const loadMoreCategories = async () => {
                                     className="flex-1"
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      const phone = "+21629380898";
-                                      const message = encodeURIComponent(
-                                        `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
-                                      );
-                                      window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
+                                      handleContactRedirect({
+                                        phoneE164: "+21629380898",
+                                        message: `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}${product.reference ? ` (Réf: ${product.reference})` : ""}\n\nMerci de me confirmer la disponibilité.`,
+                                        desktopEmail: "info@bastide.com.tn",
+                                        desktopSubject: "Commande de produit depuis le site Bastide",
+                                        desktopBodyPrefix: "Demande de commande depuis le site Bastide Tunisie:\n\n",
+                                      });
                                     }}
                                   >
                                     <ShoppingCart className="mr-2 h-4 w-4" />
@@ -983,10 +985,7 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
 
   const [active, setActive] = useState(0);
 
-  const priceLabel =
-    product.prix != null
-      ? `${product.prix}${product.devise === "EUR" ? "€" : product.devise ? ` ${product.devise}` : ""}`
-      : "—";
+  const priceLabel = product.prix != null ? `${product.prix} DT` : "—";
 
   // 👉 garde le HTML tel quel
   const description = product.description_html || "";
@@ -1049,13 +1048,15 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
           variant="primary"
           size="sm"
           className="flex-1"
-          onClick={() => {
-            const phone = "+21629380898";
-            const message = encodeURIComponent(
-              `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.titre}\n\nMerci de me confirmer la disponibilité.`
-            );
-            window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
-          }}
+        onClick={() => {
+          handleContactRedirect({
+            phoneE164: "+21629380898",
+            message: `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.titre}${(product as any).reference ? ` (Réf: ${(product as any).reference})` : ""}\n\nMerci de me confirmer la disponibilité.`,
+            desktopEmail: "info@bastide.com.tn",
+            desktopSubject: "Commande de produit depuis le site Bastide",
+            desktopBodyPrefix: "Demande de commande depuis le site Bastide Tunisie:\n\n",
+          });
+        }}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Commander

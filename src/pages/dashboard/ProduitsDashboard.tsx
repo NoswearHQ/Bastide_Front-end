@@ -200,7 +200,7 @@ export default function ProduitsDashboard() {
                     {p.titre}
                   </td>
                   <td className="px-6 py-3 border-b text-gray-600">
-                    {p.prix ? `${p.prix} ${p.devise}` : "—"}
+                    {p.prix ? `${p.prix} DT` : "—"}
                   </td>
                   <td className="px-6 py-3 border-b text-gray-600">
                     {p.categorie_nom || "—"}

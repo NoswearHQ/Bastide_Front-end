@@ -17,8 +17,7 @@ export type UiProduct = {
 
   export function toUiProduct(p: Product): UiProduct {
     const price = p.prix ?? null;
-    const devise = p.devise || "EUR";
-    const priceLabel = price ? `${price}${devise === "EUR" ? "€" : ` ${devise}`}` : "—";
+    const priceLabel = price ? `${price} DT` : "—";
     const images = parseGallery(p.galerie_json);
   
     return {
