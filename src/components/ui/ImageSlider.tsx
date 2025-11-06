@@ -7,7 +7,7 @@ type ImageSliderProps = {
   className?: string;
 };
 
-const defaultImages = Array.from({ length: 8 }).map((_, i) => `/images/${i + 1}.webp`);
+const defaultImages = Array.from({ length: 8 }).map((_, i) => `/logo/${i + 1}.webp`);
 
 export default function ImageSlider({ images = defaultImages, intervalMs = 4000, className = "" }: ImageSliderProps) {
   const [index, setIndex] = useState(0);
