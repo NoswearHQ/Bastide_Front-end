@@ -3,6 +3,7 @@ import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MessageCircle, Wrench, Lightbulb, Clock, Truck } from "lucide-react";
 import { safeProductImage } from "@/lib/images";
+import { handleContactRedirect } from "@/lib/contact";
 import Seo from "@/components/Seo";
 import { useEffect } from "react";
 const Magasin1Image = safeProductImage("images/s4.png");
@@ -122,16 +123,23 @@ export default function LocationMateriel() {
 
         {/* Boutons d’action */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center sm:justify-start">
-          {/* Bouton WhatsApp */}
-          <a
-            href={`https://wa.me/${magasin.whatsapp}?text=Bonjour,%20je%20souhaite%20avoir%20des%20informations%20sur%20la%20location%20de%20matériel%20médical.`}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* Bouton Contact adaptatif */}
+          <button
+            onClick={() =>
+              handleContactRedirect({
+                phoneE164: `+${magasin.whatsapp}`,
+                message:
+                  "Bonjour, je souhaite avoir des informations sur la location de matériel médical.",
+                desktopSubject: "Contact – Location de matériel",
+                desktopBodyPrefix: `Demande depuis la page Location – ${magasin.name}:\n\n`,
+              })
+            }
             className="inline-flex items-center justify-center gap-2 bg-medical-primary text-white font-medium py-2 px-6 rounded-full hover:bg-medical-primary/90 transition"
+            type="button"
           >
             <MessageCircle className="h-5 w-5" />
             Contacter
-          </a>
+          </button>
 
           {/* Bouton Localiser */}
           <a
@@ -251,14 +259,21 @@ export default function LocationMateriel() {
           <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
             Notre équipe est à votre écoute pour vous aider à choisir le matériel médical le plus adapté à vos besoins.
           </p>
-          <a
-            href="https://wa.me/21629380898?text=Bonjour,%20je%20souhaite%20avoir%20des%20renseignements%20sur%20la%20location%20de%20matériel%20médical."
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            type="button"
+            onClick={() =>
+              handleContactRedirect({
+                phoneE164: "+21629380898",
+                message:
+                  "Bonjour, je souhaite avoir des renseignements sur la location de matériel médical.",
+                desktopSubject: "Contact – Location de matériel",
+                desktopBodyPrefix: "Demande depuis le site Bastide Tunisie:\n\n",
+              })
+            }
             className="bg-white text-medical-primary font-medium py-3 px-8 rounded-lg hover:bg-gray-100 transition"
           >
-            Discuter sur WhatsApp
-          </a>
+            Contacter
+          </button>
         </div>
       </section>
     </Layout>

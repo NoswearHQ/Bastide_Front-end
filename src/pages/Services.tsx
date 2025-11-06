@@ -5,6 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 import Seo from "@/components/Seo";
+import ImageSlider from "@/components/ui/ImageSlider";
 
 import { safeProductImage } from "@/lib/images";
 
@@ -21,20 +22,9 @@ export default function Services() {
         canonical="https://bastide.tn/services"
         image={safeProductImage("images/bastidelogo.png")}
       />
-      {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
-        <div className="medical-container">
-          <Breadcrumb items={[{ label: "Services" }]} />
-          <div className="mt-8">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-              Nos services
-            </h1>
-            <p className="text-xl opacity-90 max-w-3xl">
-              Découvrez les principaux services proposés par Bastide Tunisie pour vous accompagner au quotidien,
-              à domicile ou en magasin.
-            </p>
-          </div>
-        </div>
+      {/* Hero Slider */}
+      <section>
+        <ImageSlider />
       </section>
 
       {/* Services Section */}

@@ -9,6 +9,7 @@ import { MedicalCard } from "@/components/ui/MedicalCard";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { getArticles, type Article } from "@/lib/api";
 import { safeProductImage } from "@/lib/images";
+import ImageSlider from "@/components/ui/ImageSlider";
 
 export default function Actualites() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,24 +108,9 @@ export default function Actualites() {
 
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
-        <div className="medical-container">
-          <Breadcrumb 
-            items={[
-              { label: "Actualités" }
-            ]} 
-          />
-          <div className="mt-8">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-              Actualités médicales
-            </h1>
-            <p className="text-xl opacity-90 max-w-3xl">
-              Restez informé des dernières avancées médicales, innovations technologiques 
-              et actualités de notre établissement de santé.
-            </p>
-          </div>
-        </div>
+      {/* Hero Slider */}
+      <section>
+        <ImageSlider />
       </section>
 
       {/* Filters Section */}

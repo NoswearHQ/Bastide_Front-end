@@ -18,7 +18,9 @@ import {
 } from "@/lib/api";
 import { toUiProduct, type UiProduct } from "@/types/shop";
 import { imageUrl, safeProductImage, parseGallery } from "@/lib/images";
+import { handleContactRedirect, openMailDevis } from "@/lib/contact";
 import Seo from "@/components/Seo";
+import ImageSlider from "@/components/ui/ImageSlider";
 import { useSearchParams } from "react-router-dom";
 // ---------- Helpers (décodage/stripping & fallback desc)
 function htmlDecode(input: string): string {
@@ -491,18 +493,9 @@ const loadMoreCategories = async () => {
         description="Découvrez notre catalogue de matériel médical : mobilité, incontinence, confort et soins. Vente et location en Tunisie."
         canonical="https://bastide.tn/produits"
       />
-      {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
-        <div className="medical-container">
-          <Breadcrumb items={[{ label: "Produits" }]} />
-          <div className="mt-8">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">Produits médicaux</h1>
-            <p className="text-xl opacity-90 max-w-3xl">
-              Découvrez notre catalogue d&apos;équipements médicaux professionnels,
-              sélectionnés pour leur qualité et leur fiabilité.
-            </p>
-          </div>
-        </div>
+      {/* Hero Slider */}
+      <section>
+        <ImageSlider />
       </section>
 
       {/* Filters Section */}
@@ -699,11 +692,12 @@ const loadMoreCategories = async () => {
     className="flex-1"
     onClick={(e) => {
       e.stopPropagation();
-      const phone = "+21629380898";
-      const message = encodeURIComponent(
-        `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`
-      );
-      window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
+      handleContactRedirect({
+        phoneE164: "+21629380898",
+        message: `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`,
+        desktopSubject: "Commande produit",
+        desktopBodyPrefix: "Demande de commande depuis le site Bastide Tunisie:\n\n",
+      });
     }}
   >
     <ShoppingCart className="mr-2 h-4 w-4" />
@@ -958,11 +952,10 @@ const loadMoreCategories = async () => {
   <MedicalButton
     variant="outline"
     onClick={() => {
-      const phone = "+21629380898"; // même numéro WhatsApp
-      const message = encodeURIComponent(
-        "Bonjour 👋, je souhaite obtenir un devis pour du matériel médical Bastide Tunisie."
-      );
-      window.open(`https://wa.me/${phone.replace(/\D/g, "")}?text=${message}`, "_blank");
+      openMailDevis({
+        subject: "Demande de devis",
+        body: "Bonjour, je souhaite obtenir un devis pour du matériel médical Bastide Tunisie.\n\nMerci.",
+      });
     }}
   >
     Demander un devis

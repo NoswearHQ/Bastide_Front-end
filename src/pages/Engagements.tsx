@@ -1,25 +1,14 @@
 import { Link } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import Breadcrumb from "@/components/ui/Breadcrumb";
+import ImageSlider from "@/components/ui/ImageSlider";
 
 export default function Engagements() {
   return (
     <Layout>
-      {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
-        <div className="medical-container">
-          <Breadcrumb items={[{ label: "Engagements" }]} />
-          <div className="mt-8">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">
-              Nos engagements
-            </h1>
-            <p className="text-xl opacity-90 max-w-3xl">
-              Prendre soin de nos semblables est la volonté du groupe Bastide Le
-              Confort Médical. Depuis plus de 40 ans, nous agissons ensemble
-              pour trouver des solutions qui améliorent le quotidien.
-            </p>
-          </div>
-        </div>
+      {/* Hero Slider */}
+      <section>
+        <ImageSlider />
       </section>
 
       {/* Engagements Section */}
