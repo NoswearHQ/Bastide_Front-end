@@ -99,9 +99,6 @@ const MySwal = withReactContent(Swal);
 type CatOption = { id: string; label: string };
 
 export default function Produits() {
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, []);
   const [params, setParams] = useSearchParams();
 
   // UI state
@@ -395,7 +392,6 @@ const handleCategorySelect = (categoryId: string) => {
   setSelectedCatIds(newIds);
   setCurrentPage(1);
   updateUrl({ categoryIds: newIds });
-  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const handleSortChange = (sort: string) => {
@@ -413,7 +409,6 @@ const handleSearchChange = (search: string) => {
 const handlePageChange = (page: number) => {
   setCurrentPage(page);
   updateUrl({ page });
-  window.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const loadMoreCategories = async () => {
