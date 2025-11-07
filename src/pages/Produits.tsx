@@ -22,6 +22,7 @@ import { handleContactRedirect, openMailDevis } from "@/lib/contact";
 import Seo from "@/components/Seo";
 import ImageSlider from "@/components/ui/ImageSlider";
 import { useSearchParams } from "react-router-dom";
+import { consumeScrollPosition } from "@/lib/scroll";
 // ---------- Helpers (décodage/stripping & fallback desc)
 function htmlDecode(input: string): string {
   const txt = document.createElement("textarea");
@@ -100,6 +101,15 @@ type CatOption = { id: string; label: string };
 
 export default function Produits() {
   const [params, setParams] = useSearchParams();
+
+  useEffect(() => {
+    const stored = consumeScrollPosition("/produits");
+    if (stored != null) {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: stored, behavior: "auto" });
+      });
+    }
+  }, []);
 
   // UI state
   const [currentPage, setCurrentPage] = useState(1);

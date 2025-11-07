@@ -17,6 +17,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { rememberScrollPosition } from "@/lib/scroll";
 
 const PillarCard = ({ title, categoryId }: { title: string; categoryId: string }) => (
   <Link
@@ -257,7 +258,10 @@ export default function Home() {
                         {product.prix ? `${product.prix} DT` : "Prix sur demande"}
                       </span>
                       <MedicalButton variant="outline" size="sm" asChild>
-                        <Link to={`/produits?q=${encodeURIComponent(product.titre)}`}>
+                        <Link
+                          to={`/produits?q=${encodeURIComponent(product.titre)}`}
+                          onClick={() => rememberScrollPosition("/produits")}
+                        >
                           Découvrir
                         </Link>
                       </MedicalButton>
