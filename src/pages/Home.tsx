@@ -4,11 +4,19 @@ import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { safeProductImage } from "@/lib/images";
 import Layout from "@/components/layout/Layout";
-import { useEffect, useState } from "react";
-import { getCategories, type Category } from "@/lib/api";
+import { useEffect, useMemo, useState } from "react";
+import { getCategories, getProducts, type Category, type Product } from "@/lib/api";
 import CategoryPillarsDynamic from "@/components/catalog/CategoryPillarsDynamic";
 import Seo from "@/components/Seo";
 import ProductSearchBar from "@/components/search/ProductSearchBar";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 const PillarCard = ({ title, categoryId }: { title: string; categoryId: string }) => (
   <Link
@@ -83,6 +91,28 @@ const productPillars = [
 export default function Home() {
   const [cats, setCats] = useState<Category[]>([]);
   const [loadingCats, setLoadingCats] = useState(true);
+  const [highlightProducts, setHighlightProducts] = useState<Product[]>([]);
+  const [loadingHighlights, setLoadingHighlights] = useState(true);
+  const [highlightError, setHighlightError] = useState<string | null>(null);
+  const [logoApi, setLogoApi] = useState<CarouselApi | null>(null);
+  const [isLogoPaused, setIsLogoPaused] = useState(false);
+
+  const partnerLogos = useMemo(
+    () => [
+      { src: "/logo/veinax.jpg", name: "Veinax" },
+      { src: "/logo/logo-aircast.jpg", name: "Aircast" },
+      { src: "/logo/logoclientdjoglobal.jpg", name: "DJO Global" },
+      { src: "/logo/292.jpg", name: "292" },
+      { src: "/logo/invacare.jpg", name: "Invacare" },
+      { src: "/logo/herderegen.jpg", name: "Herder" },
+      { src: "/logo/meditec.webp", name: "Meditec" },
+      { src: "/logo/pharmaouest.png", name: "Pharmaouest" },
+      { src: "/logo/dentites.png", name: "Dentites" },
+      { src: "/logo/wincare.png", name: "Wincare" },
+      { src: "/logo/dodo.svg", name: "Dodo" },
+    ],
+    [],
+  );
 
   useEffect(() => {
     (async () => {
@@ -94,6 +124,48 @@ export default function Home() {
       }
     })();
   }, []);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        const { rows } = await getProducts({ limit: 36 });
+        if (!isMounted) return;
+        const list = (rows as Product[]) || [];
+        const shuffled = [...list];
+        for (let i = shuffled.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        setHighlightProducts(shuffled.slice(0, 6));
+      } catch (error) {
+        if (isMounted) {
+          setHighlightError("Impossible de charger les produits pour le moment.");
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingHighlights(false);
+        }
+      }
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!logoApi) return undefined;
+
+    const autoplay = window.setInterval(() => {
+      if (!isLogoPaused) {
+        logoApi.scrollNext();
+      }
+    }, 3500);
+
+    return () => {
+      window.clearInterval(autoplay);
+    };
+  }, [logoApi, isLogoPaused]);
 
   // On cible les 4 “piliers” par slug (ou par nom si tu préfères)
   const wantedSlugs = new Map<string, string>([
@@ -120,6 +192,131 @@ export default function Home() {
       <section className="pt-12 pb-6 bg-white border-b border-gray-200">
         <div className="medical-container">
           <ProductSearchBar />
+        </div>
+      </section>
+
+      {/* Highlighted Products */}
+      <section className="py-16 bg-gray-50 border-b border-gray-200 mt-12">
+        <div className="medical-container">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <p className="uppercase text-sm font-semibold tracking-wide text-medical-primary mb-3">
+              Nos sélections du moment
+            </p>
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Découvrez nos produits phares</h2>
+            <p className="text-lg text-gray-600">
+              Une sélection renouvelée régulièrement pour vous inspirer et faciliter votre choix de matériel médical.
+            </p>
+          </div>
+
+          {highlightError && (
+            <div className="text-center text-red-600 font-medium mb-8">{highlightError}</div>
+          )}
+
+          {loadingHighlights ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 3 }).map((_, idx) => (
+                <div
+                  key={idx}
+                  className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+                >
+                  <div className="h-40 rounded-xl bg-gray-200 mb-6" />
+                  <div className="h-4 w-3/4 rounded bg-gray-200 mb-3" />
+                  <div className="h-4 w-1/2 rounded bg-gray-200 mb-6" />
+                  <div className="flex items-center justify-between">
+                    <div className="h-4 w-20 rounded bg-gray-200" />
+                    <div className="h-10 w-28 rounded bg-gray-200" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : highlightProducts.length > 0 ? (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {highlightProducts.map((product) => (
+                <div
+                  key={product.id}
+                  className="group flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <div className="relative flex items-center justify-center bg-white p-6">
+                    <img
+                      src={safeProductImage(product.image_miniature)}
+                      alt={product.titre}
+                      loading="lazy"
+                      className="h-48 w-full object-contain transition duration-500 group-hover:scale-105"
+                    />
+                    <div className="pointer-events-none absolute inset-0 rounded-2xl border border-transparent group-hover:border-medical-primary/20" />
+                  </div>
+                  <div className="flex flex-1 flex-col p-6 pt-4">
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">{product.titre}</h3>
+                      {product.reference && (
+                        <p className="text-sm text-gray-500 mt-1">Réf : {product.reference}</p>
+                      )}
+                    </div>
+                    <div className="mt-auto flex items-center justify-between gap-3">
+                      <span className="text-xl font-bold text-medical-primary">
+                        {product.prix ? `${product.prix} DT` : "Prix sur demande"}
+                      </span>
+                      <MedicalButton variant="outline" size="sm" asChild>
+                        <Link to={`/produits?q=${encodeURIComponent(product.titre)}`}>
+                          Découvrir
+                        </Link>
+                      </MedicalButton>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-gray-500">Aucun produit à afficher pour le moment.</div>
+          )}
+        </div>
+      </section>
+
+      {/* Partner Logos */}
+      <section className="py-16 bg-white">
+        <div className="medical-container">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-8">
+            <div>
+              <p className="uppercase text-sm font-semibold tracking-wide text-medical-primary mb-2">
+                Ils nous font confiance
+              </p>
+              <h2 className="text-3xl font-bold text-gray-900">Nos partenaires</h2>
+            </div>
+            <p className="text-gray-500 max-w-2xl">
+              Des marques reconnues du secteur médical nous accompagnent pour garantir des solutions fiables et innovantes.
+            </p>
+          </div>
+          <div
+            onMouseEnter={() => setIsLogoPaused(true)}
+            onMouseLeave={() => setIsLogoPaused(false)}
+            className="relative"
+          >
+            <Carousel
+              setApi={setLogoApi}
+              opts={{ align: "start", loop: true, skipSnaps: false }}
+              className="px-4"
+            >
+              <CarouselContent className="-ml-4">
+                {partnerLogos.map((logo) => (
+                  <CarouselItem
+                    key={logo.src}
+                    className="basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6 pl-4"
+                  >
+                    <div className="group flex h-32 items-center justify-center rounded-2xl border border-gray-100 bg-white px-6 py-4 shadow-sm transition duration-300 hover:shadow-lg">
+                      <img
+                        src={logo.src}
+                        alt={logo.name}
+                        loading="lazy"
+                        className="max-h-16 w-full object-contain transition duration-500 group-hover:scale-105 group-hover:brightness-110"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex -left-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white" />
+              <CarouselNext className="hidden md:flex -right-2 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white" />
+            </Carousel>
+          </div>
         </div>
       </section>
 
@@ -409,7 +606,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Products Section */}
+      {/* Products Section 
      
 <section className="medical-section">
   <div className="medical-container">
@@ -425,7 +622,7 @@ export default function Home() {
    
   </div>
 </section>
-
+*/}
       {/* Testimonials Section */}
       <section className="medical-section bg-gray-50">
         <div className="medical-container">
