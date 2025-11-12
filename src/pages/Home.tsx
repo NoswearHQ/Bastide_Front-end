@@ -68,6 +68,12 @@ const testimonials = [
   {
     name: "Client",
     role: "Acheteur",
+    content: "Bonjour Manel merci sincèrement pour votre professionnalisme. Merci encore",
+    rating: 5,
+  },
+  {
+    name: "Client",
+    role: "Acheteur",
     content: "Merci beaucoup ❤️❤️❤️ pour votre gentillesse je vous souhaite une excellente journée ❤️❤️",
     rating: 5,
   },
