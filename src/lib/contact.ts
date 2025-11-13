@@ -196,7 +196,8 @@ export async function handleSmartOrder({
 
     const response = await sendOrderEmail(orderData);
 
-    if (response.success) {
+    // CRITICAL: Only show success if backend explicitly returns success: true
+    if (response.success === true) {
       await Swal.fire({
         icon: "success",
         title: "Commande envoyée !",
@@ -204,13 +205,23 @@ export async function handleSmartOrder({
         confirmButtonColor: "#009090",
       });
     } else {
-      throw new Error(response.error || "Erreur lors de l'envoi de la commande");
+      // Backend returned success: false, show error
+      const errorMsg = response.error || "Erreur lors de l'envoi de la commande";
+      await Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: errorMsg,
+        confirmButtonColor: "#dc2626",
+      });
     }
   } catch (error: any) {
+    // Network error or other exception
+    console.error("Order email error:", error);
+    const errorMessage = error?.message || "Erreur serveur: impossible d'envoyer la commande.";
     await Swal.fire({
       icon: "error",
       title: "Erreur",
-      text: error?.message || "Une erreur est survenue lors de l'envoi de votre commande. Veuillez réessayer.",
+      text: errorMessage,
       confirmButtonColor: "#dc2626",
     });
   }
