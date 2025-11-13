@@ -32,8 +32,21 @@ const tokenStore = {
 async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, init);
   if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
+    // Try to parse error response as JSON
+    let errorMessage = `HTTP ${res.status}: ${res.statusText}`;
+    try {
+      const errorData = await res.json();
+      if (errorData.error) {
+        errorMessage = errorData.error;
+      } else if (errorData.message) {
+        errorMessage = errorData.message;
+      }
+    } catch {
+      // If JSON parsing fails, use status text
+      const text = await res.text().catch(() => "");
+      if (text) errorMessage = text;
+    }
+    throw new Error(errorMessage);
   }
   // Si 204, pas de JSON à parser
   if (res.status === 204) return undefined as unknown as T;
@@ -360,5 +373,23 @@ export async function uploadArticleImages(titre: string, images: File[]): Promis
   return fetchWithAuth<{ message: string; images: string[] }>(`/crud/articles/upload`, {
     method: "POST",
     body: formData,
+  });
+}
+
+// ---------- Order Email Endpoint ----------
+
+export type OrderRequest = {
+  email: string;
+  phone: string;
+  product_name: string;
+  product_reference?: string;
+  subject?: string;
+};
+
+export async function sendOrderEmail(order: OrderRequest): Promise<{ success: boolean; message?: string; error?: string }> {
+  return fetchPublic<{ success: boolean; message?: string; error?: string }>(`/api/orders/send`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(order),
   });
 }

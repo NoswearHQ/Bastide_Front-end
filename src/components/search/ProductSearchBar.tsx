@@ -52,7 +52,7 @@ export default function ProductSearchBar() {
     return () => clearTimeout(searchTimeout);
   }, [searchTerm]);
 
-  const formatPrice = (price: string | null, devise: string) => {
+  const formatPrice = (price: string | null) => {
     if (!price) return "Prix sur demande";
     const numPrice = parseFloat(price);
     if (isNaN(numPrice)) return "Prix sur demande";
@@ -104,10 +104,13 @@ export default function ProductSearchBar() {
             </div>
           ) : results.length > 0 ? (
             <div className="py-2">
-              {results.map((product) => (
+              {results.map((product) => {
+                const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+                const productUrl = `/produit/${product.id}-${seoSlug}`;
+                return (
                 <Link
                   key={product.id}
-                  to={`/produits?q=${encodeURIComponent(product.titre)}`}
+                  to={productUrl}
                   onClick={() => {
                     setIsOpen(false);
                     setSearchTerm("");
@@ -130,13 +133,14 @@ export default function ProductSearchBar() {
                       )}
                       {product.prix && (
                         <span className="text-sm font-medium text-medical-primary">
-                          {formatPrice(product.prix, product.devise)}
+                          {formatPrice(product.prix)}
                         </span>
                       )}
                     </div>
                   </div>
                 </Link>
-              ))}
+              );
+              })}
               {searchTerm && (
                 <Link
                   to={`/produits?q=${encodeURIComponent(searchTerm)}`}

@@ -202,8 +202,55 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Highlighted Products */}
-      <section className="py-16 bg-gray-50 border-b border-gray-200 mt-12">
+      {/* Hero Section - Bastide Le Confort Médical */}
+      <section className="medical-hero bg-white">
+  <div className="medical-container relative z-10">
+    <div className="grid lg:grid-cols-2 gap-12 items-center">
+      <div>
+        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+          Bastide Le Confort Médical,{" "}
+          <span className="text-gradient-primary">1er réseau de matériel médical en Tunisie</span>
+        </h1>
+        <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+          Spécialisée dans la vente et la location de matériel médical, Bastide Le Confort Médical
+          accompagne particuliers et professionnels pour favoriser l'autonomie, la mobilité et
+          le bien-être au quotidien.
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4">
+          <MedicalButton variant="primary" size="lg" asChild>
+            <Link to="/contact">
+              Prendre rendez-vous
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </MedicalButton>
+          <MedicalButton variant="outline" size="lg" asChild>
+            <Link to="/services">Nos services</Link>
+          </MedicalButton>
+        </div>
+      </div>
+
+      <div className="relative">
+        <picture>
+          <source srcSet={safeProductImage("images/hero-medical1.webp")} type="image/webp" />
+          <img
+            src={safeProductImage("images/hero-medical1.jpg")}
+            alt="Établissement médical moderne avec équipe soignante"
+            width={752}
+            height={500}
+            className="w-full h-[500px] object-cover rounded-2xl shadow-medical-xl"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+      {/* Highlighted Products - Nos sélections du moment */}
+      <section className="py-16 bg-white border-b border-gray-200">
         <div className="medical-container">
           <div className="text-center max-w-3xl mx-auto mb-12">
             <p className="uppercase text-sm font-semibold tracking-wide text-medical-primary mb-3">
@@ -265,8 +312,7 @@ export default function Home() {
                       </span>
                       <MedicalButton variant="outline" size="sm" asChild>
                         <Link
-                          to={`/produits?q=${encodeURIComponent(product.titre)}`}
-                          onClick={() => rememberScrollPosition("/produits")}
+                          to={`/produit/${product.id}-${product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}`}
                         >
                           Découvrir
                         </Link>
@@ -330,53 +376,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Hero Section */}
-      <section className="medical-hero">
-  <div className="medical-container relative z-10">
-    <div className="grid lg:grid-cols-2 gap-12 items-center">
-      <div>
-        <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-          Bastide Le Confort Médical,{" "}
-          <span className="text-gradient-primary">1er réseau de matériel médical en Tunisie</span>
-        </h1>
-        <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-          Spécialisée dans la vente et la location de matériel médical, Bastide Le Confort Médical
-          accompagne particuliers et professionnels pour favoriser l’autonomie, la mobilité et
-          le bien-être au quotidien.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <MedicalButton variant="primary" size="lg" asChild>
-            <Link to="/contact">
-              Prendre rendez-vous
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </MedicalButton>
-          <MedicalButton variant="outline" size="lg" asChild>
-            <Link to="/services">Nos services</Link>
-          </MedicalButton>
-        </div>
-      </div>
-
-      <div className="relative">
-        <picture>
-          <source srcSet={safeProductImage("images/hero-medical1.webp")} type="image/webp" />
-          <img
-            src={safeProductImage("images/hero-medical1.jpg")}
-            alt="Établissement médical moderne avec équipe soignante"
-            width={752}
-            height={500}
-            className="w-full h-[500px] object-cover rounded-2xl shadow-medical-xl"
-            loading="eager"
-            fetchPriority="high"
-            decoding="async"
-          />
-        </picture>
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 {/* Nouvelle section Bastide - Détails */}
 <section className="py-20 bg-white">
   <div className="medical-container max-w-5xl mx-auto text-center">
@@ -438,7 +437,7 @@ export default function Home() {
 </section>
 
 {/* Section Stats existante */}
-<section className="py-16 bg-gray-50">
+<section className="py-16 bg-white">
   <div className="medical-container">
     <div className="medical-grid medical-grid--4">
       {stats.map((stat, index) => (
@@ -455,7 +454,7 @@ export default function Home() {
 
 
       {/* Services Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
   <div className="medical-container">
     <div className="text-center mb-12">
       <h2 className="text-4xl font-bold text-gray-900 mb-4">
@@ -572,7 +571,7 @@ export default function Home() {
 
 
       {/* Features Section */}
-      <section className="medical-section bg-gray-50">
+      <section className="medical-section bg-white">
         <div className="medical-container">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -634,7 +633,7 @@ export default function Home() {
 </section>
 */}
       {/* Testimonials Section */}
-      <section className="medical-section bg-gray-50">
+      <section className="medical-section bg-white">
         <div className="medical-container">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">

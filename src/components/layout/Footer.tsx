@@ -42,12 +42,20 @@ export default function Footer() {
   </div>
 
   <div className="space-y-4 text-gray-300">
-    {/* Adresse */}
+    {/* Adresses */}
     <div className="flex items-start space-x-3">
       <MapPin className="h-5 w-5 mt-0.5 text-medical-primary flex-shrink-0" />
-      <div>
-        <p>Centre Urbain Nord, Immeuble Express</p>
-        <p>Tunis, Tunisie 1082</p>
+      <div className="space-y-2">
+        <div>
+          <p className="font-medium text-white mb-1">Centre Urbain Nord</p>
+          <p>Centre Urbain Nord, Immeuble Express</p>
+          <p>Tunis, Tunisie 1082</p>
+        </div>
+        <div>
+          <p className="font-medium text-white mb-1">Aouina</p>
+          <p>Avenue de l'Aouina</p>
+          <p>Tunis, Tunisie</p>
+        </div>
       </div>
     </div>
 
@@ -66,10 +74,18 @@ export default function Footer() {
     {/* Horaires */}
     <div className="flex items-start space-x-3">
       <Clock className="h-5 w-5 mt-0.5 text-medical-primary flex-shrink-0" />
-      <div>
-        <p>Lun - Ven : 8h30 - 18h30</p>
-        <p>Samedi : 9h - 13h</p>
-        <p>Urgences : 24h/24 - 7j/7</p>
+      <div className="space-y-2">
+        <div>
+          <p className="font-medium text-white mb-1">Lundi - Vendredi :</p>
+          <p>Centre Urbain Nord — 8h à 18h</p>
+          <p>Aouina — 8h à 20h</p>
+        </div>
+        <div>
+          <p className="font-medium text-white mb-1">Samedi :</p>
+          <p>Centre Urbain Nord — 8h à 14h</p>
+          <p>Aouina — 8h à 20h</p>
+        </div>
+        <p className="font-medium text-medical-primary mt-2">Urgences : 24h/24 - 7j/7</p>
       </div>
     </div>
 

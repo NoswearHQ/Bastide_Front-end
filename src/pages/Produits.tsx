@@ -5,23 +5,20 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import Pagination from "@/components/ui/Pagination";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { MedicalButton } from "@/components/ui/medical-button";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import {
   getProducts,
   type ProductQuery,
   getCategories,
   type Category,
   type Product,
-  getProductById,       
-  type ProductDetail,    
+  type ProductDetail,
 } from "@/lib/api";
 import { toUiProduct, type UiProduct } from "@/types/shop";
 import { imageUrl, safeProductImage, parseGallery } from "@/lib/images";
-import { handleContactRedirect, openMailDevis } from "@/lib/contact";
+import { handleSmartOrder } from "@/lib/contact";
 import Seo from "@/components/Seo";
 import ImageSlider from "@/components/ui/ImageSlider";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { consumeScrollPosition } from "@/lib/scroll";
 // ---------- Helpers (décodage/stripping & fallback desc)
 function htmlDecode(input: string): string {
@@ -29,42 +26,12 @@ function htmlDecode(input: string): string {
   txt.innerHTML = input;
   return txt.value;
 }
-const openProductDetails = async (id: string | number) => {
-  // petit loader SweetAlert le temps de charger
-  Swal.fire({
-    title: "Chargement...",
-    didOpen: () => Swal.showLoading(),
-    allowOutsideClick: false,
-    allowEscapeKey: false,
-    showConfirmButton: false,
-    backdrop: true,
-  });
 
-  try {
-    const data = await getProductById(id);
-
-    await MySwal.fire({
-      title: undefined,              // on gère le titre dans notre vue
-      html: <ProductDetailsView product={data} />,
-      width: "64rem",
-      showConfirmButton: false,
-      showCloseButton: true,
-      focusConfirm: false,
-      backdrop: true,
-      customClass: {
-        popup: "rounded-2xl p-0",
-        htmlContainer: "p-6",
-        closeButton: "text-gray-500 hover:text-gray-700",
-      },
-    });
-  } catch (e: any) {
-    Swal.fire({
-      icon: "error",
-      title: "Erreur",
-      text: e?.message ? String(e.message) : "Impossible de charger le produit.",
-    });
-  }
-};
+// Helper function to generate product URL
+function getProductUrl(id: string | number, slug?: string | null, titre?: string): string {
+  const seoSlug = slug || (titre ? titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") : "");
+  return `/produit/${id}${seoSlug ? `-${seoSlug}` : ""}`;
+}
 
 function stripHtml(html: string): string {
   const tmp = document.createElement("div");
@@ -95,12 +62,12 @@ const sortOptions = [
   { value: "rating", label: "Mieux notés" },  // visuel uniquement
   { value: "bestseller", label: "Meilleures ventes" }, // visuel uniquement
 ];
-const MySwal = withReactContent(Swal);
 
 type CatOption = { id: string; label: string };
 
 export default function Produits() {
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const stored = consumeScrollPosition("/produits");
@@ -624,12 +591,14 @@ const loadMoreCategories = async () => {
                 <div className="medical-grid medical-grid--3">
               {rows.map((product) => {
   const description = product.description ?? "";       // safe
+  const rawProduct = rawById[product.id];
+  const productUrl = getProductUrl(product.id, rawProduct?.slug, rawProduct?.titre || product.name);
 
   return (
     <div
       key={product.id}
       className="h-full flex flex-col cursor-pointer"
-      onClick={() => openProductDetails(product.id)}
+      onClick={() => navigate(productUrl)}
       role="button"
       tabIndex={0}
     >
@@ -695,13 +664,13 @@ const loadMoreCategories = async () => {
     variant="primary"
     size="sm"
     className="flex-1"
-    onClick={(e) => {
+    onClick={async (e) => {
       e.stopPropagation();
-      handleContactRedirect({
-        phoneE164: "+21629380898",
-        message: `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}\n\nMerci de me confirmer la disponibilité.`,
-        desktopSubject: "Commande produit",
-        desktopBodyPrefix: "Demande de commande depuis le site Bastide Tunisie:\n\n",
+      const rawProduct = rawById[product.id];
+      await handleSmartOrder({
+        productName: product.name,
+        productReference: product.reference || rawProduct?.reference || undefined,
+        productPrice: product.priceLabel !== "—" ? product.priceLabel : undefined,
       });
     }}
   >
@@ -714,7 +683,12 @@ const loadMoreCategories = async () => {
     variant="outline"
     size="sm"
     className="p-2 w-9 h-9 flex items-center justify-center"
-    onClick={(e) => { e.stopPropagation(); openProductDetails(product.id); }}
+    onClick={(e) => { 
+      e.stopPropagation(); 
+      const rawProduct = rawById[product.id];
+      const productUrl = getProductUrl(product.id, rawProduct?.slug, rawProduct?.titre || product.name);
+      navigate(productUrl);
+    }}
     title="Voir les détails du produit"
   >
     <Info className="h-4 w-4" />
@@ -794,12 +768,14 @@ const loadMoreCategories = async () => {
                     <div className="medical-grid medical-grid--3">
                       {products.map((product) => {
                         const description = product.description ?? "";
+                        const rawProduct = rawById[product.id];
+                        const productUrl = getProductUrl(product.id, rawProduct?.slug, rawProduct?.titre || product.name);
 
                         return (
                           <div
                             key={product.id}
                             className="h-full flex flex-col cursor-pointer"
-                            onClick={() => openProductDetails(product.id)}
+                            onClick={() => navigate(productUrl)}
                             role="button"
                             tabIndex={0}
                           >
@@ -858,14 +834,13 @@ const loadMoreCategories = async () => {
                                     variant="primary"
                                     size="sm"
                                     className="flex-1"
-                                    onClick={(e) => {
+                                    onClick={async (e) => {
                                       e.stopPropagation();
-                                      handleContactRedirect({
-                                        phoneE164: "+21629380898",
-                                        message: `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.name}${product.reference ? ` (Réf: ${product.reference})` : ""}\n\nMerci de me confirmer la disponibilité.`,
-                                        desktopEmail: "info@bastide.com.tn",
-                                        desktopSubject: "Commande de produit depuis le site Bastide",
-                                        desktopBodyPrefix: "Demande de commande depuis le site Bastide Tunisie:\n\n",
+                                      const rawProduct = rawById[product.id];
+                                      await handleSmartOrder({
+                                        productName: product.name,
+                                        productReference: product.reference || rawProduct?.reference || undefined,
+                                        productPrice: product.priceLabel !== "—" ? product.priceLabel : undefined,
                                       });
                                     }}
                                   >
@@ -878,7 +853,12 @@ const loadMoreCategories = async () => {
                                     variant="outline"
                                     size="sm"
                                     className="p-2 w-9 h-9 flex items-center justify-center"
-                                    onClick={(e) => { e.stopPropagation(); openProductDetails(product.id); }}
+                                    onClick={(e) => { 
+                                      e.stopPropagation(); 
+                                      const rawProduct = rawById[product.id];
+                                      const productUrl = getProductUrl(product.id, rawProduct?.slug, rawProduct?.titre || product.name);
+                                      navigate(productUrl);
+                                    }}
                                     title="Voir les détails du produit"
                                   >
                                     <Info className="h-4 w-4" />
@@ -1053,15 +1033,14 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
           variant="primary"
           size="sm"
           className="flex-1"
-        onClick={() => {
-          handleContactRedirect({
-            phoneE164: "+21629380898",
-            message: `Bonjour 👋, je souhaite commander le produit suivant :\n\n${product.titre}${(product as any).reference ? ` (Réf: ${(product as any).reference})` : ""}\n\nMerci de me confirmer la disponibilité.`,
-            desktopEmail: "info@bastide.com.tn",
-            desktopSubject: "Commande de produit depuis le site Bastide",
-            desktopBodyPrefix: "Demande de commande depuis le site Bastide Tunisie:\n\n",
-          });
-        }}
+          onClick={async () => {
+            const priceLabel = product.prix != null ? `${parseFloat(product.prix).toFixed(2)} DT` : undefined;
+            await handleSmartOrder({
+              productName: product.titre,
+              productReference: product.reference || undefined,
+              productPrice: priceLabel,
+            });
+          }}
         >
           <ShoppingCart className="mr-2 h-4 w-4" />
           Commander

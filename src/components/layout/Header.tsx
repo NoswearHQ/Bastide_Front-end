@@ -20,26 +20,26 @@ export default function Header() {
   return (
     <header className="medical-header">
       <div className="medical-container">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <img 
                 src="/logo/4fb979dc-acd1-4835-979f-7e6a108c6882.png" 
                 alt="Bastide - Le confort médical" 
-                className="h-16 w-auto"
+                className="h-20 w-auto"
               />
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-10" aria-label="Navigation principale">
+          <nav className="hidden md:flex items-center space-x-12" aria-label="Navigation principale">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
                 className={cn(
-                  "text-base text-gray-600 hover:text-gray-900 transition-colors duration-300 font-medium px-3 py-2",
+                  "text-lg text-gray-600 hover:text-gray-900 transition-colors duration-300 font-medium px-4 py-3",
                   location.pathname === item.href && "text-medical-primary font-semibold"
                 )}
               >
@@ -52,14 +52,14 @@ export default function Header() {
           <div className="md:hidden">
             <button
               type="button"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-gray-600 hover:text-gray-900 transition-colors p-2"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label="Menu mobile"
             >
               {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-8 w-8" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-8 w-8" />
               )}
             </button>
           </div>
@@ -74,7 +74,7 @@ export default function Header() {
                   key={item.name}
                   to={item.href}
                   className={cn(
-                    "block px-4 py-3 text-base text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium",
+                    "block px-4 py-4 text-lg text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-lg transition-all duration-300 font-medium",
                     location.pathname === item.href && "text-medical-primary bg-gray-50 font-semibold"
                   )}
                   onClick={() => setMobileMenuOpen(false)}

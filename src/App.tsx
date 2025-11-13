@@ -31,6 +31,7 @@ import ArticleCreate from "./pages/dashboard/ArticleCreate";
 import ArticleEdit from "./pages/dashboard/ArticleEdit";
 import ArticleDetail from "./pages/ArticleDetail";
 import ModifierCategorie from "./pages/dashboard/ModifierCategorie";
+import ProductDetail from "./pages/ProductDetail";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
           <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
           <Route path="/cookies" element={<Cookies />} />
           <Route path="/articles/:slug" element={<ArticleDetail />} />
+          <Route path="/produit/:id" element={<ProductDetail />} />
           <Route
   path="/dashboard"
   element={
