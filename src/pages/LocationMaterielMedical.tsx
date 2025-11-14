@@ -78,7 +78,7 @@ export default function LocationMateriel() {
           {/* Image à droite */}
           <div className="rounded-2xl overflow-hidden shadow-lg">
             <img
-              src={safeProductImage("images/LocationImage.webp")}
+              src={safeProductImage("images/1.webp")}
               alt="Location de matériel médical"
               className="w-full h-full object-cover"
               width={752}
