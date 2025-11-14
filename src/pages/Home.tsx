@@ -210,7 +210,7 @@ export default function Home() {
       <div>
         <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
           Bastide Le Confort Médical,{" "}
-          <span className="text-gradient-primary">1er réseau de matériel médical en Tunisie</span>
+          <span className="text-medical-primary">1er réseau de matériel médical en Tunisie</span>
         </h1>
         <p className="text-xl text-gray-600 mb-8 leading-relaxed">
           Spécialisée dans la vente et la location de matériel médical, Bastide Le Confort Médical
