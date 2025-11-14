@@ -9,6 +9,7 @@ import { getCategories, getProducts, type Category, type Product } from "@/lib/a
 import CategoryPillarsDynamic from "@/components/catalog/CategoryPillarsDynamic";
 import Seo from "@/components/Seo";
 import ProductSearchBar from "@/components/search/ProductSearchBar";
+import StoreLocations from "@/components/StoreLocations";
 import {
   Carousel,
   CarouselContent,
@@ -466,7 +467,7 @@ export default function Home() {
       </p>
     </div>
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {/* Service 1 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <img
@@ -515,30 +516,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Service 3 */}
-      <div className="relative group rounded-2xl overflow-hidden shadow-md">
-        <img
-          src={safeProductImage("images/s3.webp")}
-          alt="Réseau Bastide"
-          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
-          width={569}
-          height={320}
-          loading="lazy"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
-        <h3 className="text-lg font-semibold mb-3">
-          Votre boutique de confiance en Tunisie avec 2 magasins à votre service
-        </h3>
-        <Link
-          to="/magasins"
-          className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
-        >
-          Trouver mon magasin
-        </Link>
-      </div>
-
-      </div>
+      {/* Service 3 - Removed, replaced by StoreLocations component below */}
 
       {/* Service 4 */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
@@ -569,6 +547,8 @@ export default function Home() {
   </div>
 </section>
 
+      {/* Store Locations Section */}
+      <StoreLocations />
 
       {/* Features Section */}
       <section className="medical-section bg-white">
