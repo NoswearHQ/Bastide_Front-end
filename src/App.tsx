@@ -34,6 +34,7 @@ import ModifierCategorie from "./pages/dashboard/ModifierCategorie";
 import ProductDetail from "./pages/ProductDetail";
 import HomepageFeaturedProducts from "./pages/dashboard/HomepageFeaturedProducts";
 import Statistics from "./pages/dashboard/Statistics";
+import CategoryProductOrder from "./pages/dashboard/CategoryProductOrder";
 
 const queryClient = new QueryClient();
 
@@ -157,6 +158,14 @@ const App = () => (
             element={
               <PrivateRoute>
                 <HomepageFeaturedProducts />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard/category-products-order"
+            element={
+              <PrivateRoute>
+                <CategoryProductOrder />
               </PrivateRoute>
             }
           />
