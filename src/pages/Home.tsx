@@ -521,7 +521,7 @@ export default function Home() {
       {/* Service 4 - Assistante respiratoire */}
       <div className="relative group rounded-2xl overflow-hidden shadow-md">
         <video
-          src="/images/airoxyimage.webm"
+          src="/images/airoxyimage.webp"
           className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
           autoPlay
           loop
