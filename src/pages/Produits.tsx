@@ -78,6 +78,15 @@ export default function Produits() {
     }
   }, []);
 
+  // UI state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("name");
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // API data
+  const [rows, setRows] = useState<UiProduct[]>([]);
+
   // Auto-scroll to product list when category is selected
   useEffect(() => {
     if (selectedCatIds.length > 0 && rows.length > 0) {
@@ -90,15 +99,6 @@ export default function Produits() {
       }, 100);
     }
   }, [selectedCatIds, rows.length]);
-
-  // UI state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState("name");
-  const [searchTerm, setSearchTerm] = useState("");
-
-  // API data
-  const [rows, setRows] = useState<UiProduct[]>([]);
   const [rawById, setRawById] = useState<Record<string, Product>>({});
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
