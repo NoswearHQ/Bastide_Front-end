@@ -1,4 +1,7 @@
 // src/lib/api.ts
+import { getGlobalLogoutCallback } from "@/context/AuthContext";
+import { toast } from "sonner";
+
 type HttpMethod = "GET" | "POST" | "PATCH" | "DELETE";
 
 const API_BASE = (import.meta as any).env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
@@ -34,8 +37,9 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
   if (!res.ok) {
     // Try to parse error response as JSON
     let errorMessage = `HTTP ${res.status}: ${res.statusText}`;
+    let errorData: any = null;
     try {
-      const errorData = await res.json();
+      errorData = await res.json();
       if (errorData.error) {
         errorMessage = errorData.error;
       } else if (errorData.message) {
@@ -46,7 +50,23 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
       const text = await res.text().catch(() => "");
       if (text) errorMessage = text;
     }
-    throw new Error(errorMessage);
+    
+    // Check if it's an expired token error in the response body
+    if (
+      res.status === 401 &&
+      errorData &&
+      (errorData.message === "JWT_EXPIRED" ||
+        errorData.error === "Expired JWT Token" ||
+        String(errorData.message || "").includes("expired") ||
+        String(errorData.error || "").includes("expired"))
+    ) {
+      errorMessage = "JWT_EXPIRED";
+    }
+    
+    const error = new Error(errorMessage);
+    (error as any).status = res.status;
+    (error as any).response = errorData;
+    throw error;
   }
   // Si 204, pas de JSON à parser
   if (res.status === 204) return undefined as unknown as T;
@@ -59,6 +79,34 @@ export function fetchPublic<T>(path: string, options: RequestInit = {}): Promise
   const url = `${API_BASE}${path}`;
   const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
   return fetchJson<T>(url, { ...options, headers });
+}
+
+// Helper function to check if error is due to expired token
+function isExpiredTokenError(error: any): boolean {
+  const message = String(error?.message || "");
+  return (
+    message.includes("HTTP 401") ||
+    message.includes("Expired JWT Token") ||
+    message.includes("JWT_EXPIRED") ||
+    message.includes("expired") ||
+    message.includes("JWT Token not found") ||
+    message.includes("Invalid JWT Token")
+  );
+}
+
+// Helper function to handle expired token - logout and redirect
+function handleExpiredToken(): void {
+  const logoutCallback = getGlobalLogoutCallback();
+  if (logoutCallback) {
+    logoutCallback();
+  } else {
+    // Fallback if callback not set yet
+    tokenStore.clear();
+    toast.error("Votre session a expiré, veuillez vous reconnecter.");
+    if (window.location.pathname.startsWith("/dashboard")) {
+      window.location.href = "/login";
+    }
+  }
 }
 
 // --- Requête protégée: tente un refresh si 401 ---
@@ -82,18 +130,28 @@ export async function fetchWithAuth<T>(path: string, options: RequestInit = {}):
   try {
     return await doFetch(accessToken || undefined);
   } catch (err: any) {
-    if (String(err.message).startsWith("HTTP 401") && refreshToken) {
-      try {
-        const data = await fetchJson<{ token: string }>(`${API_BASE}/auth/refresh`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refreshToken }),
-        });
-        tokenStore.set(data.token);
-        return await doFetch(data.token);
-      } catch {
-        tokenStore.clear();
-        throw err;
+    // Check if it's an expired token error (401 status or expired message)
+    const is401 = err?.status === 401 || String(err.message || "").startsWith("HTTP 401");
+    if (isExpiredTokenError(err) || is401) {
+      // Try to refresh if we have a refresh token and it's a 401
+      if (refreshToken && is401) {
+        try {
+          const data = await fetchJson<{ token: string }>(`${API_BASE}/auth/refresh`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refreshToken }),
+          });
+          tokenStore.set(data.token);
+          return await doFetch(data.token);
+        } catch (refreshErr: any) {
+          // Refresh failed - token is definitely expired
+          handleExpiredToken();
+          throw new Error("Session expired");
+        }
+      } else {
+        // No refresh token or already tried - logout immediately
+        handleExpiredToken();
+        throw new Error("Session expired");
       }
     }
     throw err;
