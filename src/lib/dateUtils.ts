@@ -9,23 +9,33 @@ export function formatArticleDate(dateString: string | null | undefined): string
   }
 
   try {
-    // Try parsing the date
-    let date: Date;
+    // Clean and normalize the date string
+    let cleanDate = String(dateString).trim();
     
-    // Handle ISO strings and MySQL DATETIME formats
-    if (typeof dateString === "string") {
-      // Replace space with 'T' for ISO format if needed (MySQL DATETIME format)
-      const normalizedDate = dateString.includes("T") 
-        ? dateString 
-        : dateString.replace(" ", "T");
-      
-      date = new Date(normalizedDate);
-    } else {
-      date = new Date(dateString);
+    // Handle empty strings
+    if (!cleanDate || cleanDate === "null" || cleanDate === "undefined") {
+      return "Date inconnue";
     }
+
+    // Handle MySQL DATETIME format (YYYY-MM-DD HH:MM:SS) or DATE format (YYYY-MM-DD)
+    // Convert to ISO format for reliable parsing
+    if (cleanDate.includes(" ")) {
+      // MySQL DATETIME: replace space with T and add Z if no timezone
+      cleanDate = cleanDate.replace(" ", "T");
+      if (!cleanDate.includes("Z") && !cleanDate.includes("+") && !cleanDate.includes("-", 10)) {
+        cleanDate += "Z";
+      }
+    } else if (/^\d{4}-\d{2}-\d{2}$/.test(cleanDate)) {
+      // MySQL DATE format: add time and timezone
+      cleanDate = cleanDate + "T00:00:00Z";
+    }
+
+    // Parse the date
+    const date = new Date(cleanDate);
 
     // Check if date is valid
     if (isNaN(date.getTime())) {
+      console.warn("Invalid date string:", dateString);
       return "Date inconnue";
     }
 

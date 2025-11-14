@@ -29,15 +29,15 @@ export default function Cookies() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
+      <section className="bg-gray-50 text-gray-900 py-16 border-b border-gray-200">
         <div className="medical-container">
           <Breadcrumb items={[{ label: "Politique des cookies" }]} />
           <div className="mt-8">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4 flex items-center">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 flex items-center text-gray-900">
               <Cookie className="mr-4 h-12 w-12" />
               Politique des cookies
             </h1>
-            <p className="text-xl opacity-90 max-w-3xl">
+            <p className="text-xl text-gray-600 max-w-3xl">
               Découvrez comment nous utilisons les cookies et gérez vos préférences de confidentialité.
             </p>
           </div>

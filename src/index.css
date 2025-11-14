@@ -56,9 +56,9 @@
     --shadow-lg: 0 10px 15px -3px hsl(var(--gray-800) / 0.1);
     --shadow-xl: 0 20px 25px -5px hsl(var(--gray-800) / 0.1);
     
-    /* Premium Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(var(--medical-primary)), hsl(var(--medical-primary-hover)));
-    --gradient-accent: linear-gradient(135deg, hsl(var(--medical-accent)), hsl(var(--medical-accent-hover)));
+    /* Premium Gradients - Softer tones */
+    --gradient-primary: linear-gradient(135deg, hsl(180 50% 55% / 0.12), hsl(180 50% 50% / 0.08));
+    --gradient-accent: linear-gradient(135deg, hsl(var(--medical-accent) / 0.9), hsl(var(--medical-accent-hover) / 0.85));
     --gradient-subtle: linear-gradient(180deg, hsl(var(--gray-50)), hsl(0 0% 100%));
     
     /* Spacing System */

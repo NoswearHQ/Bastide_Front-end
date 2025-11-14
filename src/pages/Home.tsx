@@ -686,12 +686,12 @@ export default function Home() {
       </section>
 
       {/* CTA Section */}
-      <section className="medical-section bg-gradient-primary text-white">
+      <section className="medical-section bg-gradient-primary text-gray-900 border-t border-gray-200">
         <div className="medical-container text-center">
-          <h2 className="text-4xl font-bold mb-4">
+          <h2 className="text-4xl font-bold mb-4 text-gray-900">
             Prêt à prendre soin de votre santé ?
           </h2>
-          <p className="text-xl mb-8 opacity-90">
+          <p className="text-xl mb-8 text-gray-700">
             Contactez-nous dès aujourd'hui pour prendre rendez-vous avec l'un de nos spécialistes.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

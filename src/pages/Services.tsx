@@ -174,7 +174,7 @@ export default function Services() {
           </div>
 
           <div className="flex justify-center">
-            <div className="bg-white p-6 rounded-xl shadow-lg border border-red-200 max-w-md text-center">
+            <div className="bg-white p-6 rounded-xl shadow-md border border-red-100 max-w-md text-center">
               <h3 className="text-xl font-bold text-gray-900 mb-2">
                 Urgences 24h/24
               </h3>

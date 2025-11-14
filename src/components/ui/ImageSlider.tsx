@@ -32,7 +32,7 @@ export default function ImageSlider({ images = defaultImages, intervalMs = 4000,
   const slides = useMemo(() => images.map((src, i) => ({ src, i })), [images]);
 
   return (
-    <div className={`relative w-full overflow-hidden bg-gradient-primary ${className}`} aria-roledescription="carousel">
+    <div className={`relative w-full overflow-hidden bg-gray-50 border-b border-gray-200 ${className}`} aria-roledescription="carousel">
       {/* Slides */}
       <div className="relative w-full h-[500px] md:h-[600px]">
         {slides.map(({ src, i }) => (
