@@ -94,14 +94,15 @@ export default function Services() {
 
             {/* Service 4 - Assistante respiratoire */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
-              <video
-                src="/images/airoxyimage.webp"
-                className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
-                autoPlay
-                loop
-                muted
-                playsInline
-              />
+            <img
+          src={safeProductImage("images/airoxyimage.webp")}
+          alt="Assistante respiratoire"
+          className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+          width={480}
+          height={320}
+          loading="lazy"
+          decoding="async"
+        />
               <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
                 <h3 className="text-lg font-semibold mb-3">
                   Assistante respiratoire
