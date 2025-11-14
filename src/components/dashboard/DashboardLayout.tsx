@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { FileText, Package, FolderTree, LogOut } from "lucide-react"; // ✅ ajout de FolderTree
+import { FileText, Package, FolderTree, LogOut, Home } from "lucide-react"; // ✅ ajout de FolderTree
 import { useAuth } from "@/context/AuthContext";
 import React from "react";
 
@@ -54,6 +54,19 @@ export default function DashboardLayout({ children }: Props) {
           >
             <FolderTree className="h-5 w-5 text-gray-600" />
             <span>Gérer Catégories</span>
+          </NavLink>
+
+          {/* ✅ Lien pour les produits de la page d'accueil */}
+          <NavLink
+            to="/dashboard/homepage-products"
+            className={({ isActive }) =>
+              `px-6 py-3 flex items-center space-x-2 hover:bg-gray-100 ${
+                isActive ? "bg-gray-200 font-semibold" : ""
+              }`
+            }
+          >
+            <Home className="h-5 w-5 text-gray-600" />
+            <span>Page d'Accueil</span>
           </NavLink>
 
           <button

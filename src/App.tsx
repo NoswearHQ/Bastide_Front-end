@@ -32,6 +32,7 @@ import ArticleEdit from "./pages/dashboard/ArticleEdit";
 import ArticleDetail from "./pages/ArticleDetail";
 import ModifierCategorie from "./pages/dashboard/ModifierCategorie";
 import ProductDetail from "./pages/ProductDetail";
+import HomepageFeaturedProducts from "./pages/dashboard/HomepageFeaturedProducts";
 
 const queryClient = new QueryClient();
 
@@ -147,6 +148,14 @@ const App = () => (
   element={
     <PrivateRoute>
       <ArticleEdit />
+    </PrivateRoute>
+  }
+/>
+<Route
+  path="/dashboard/homepage-products"
+  element={
+    <PrivateRoute>
+      <HomepageFeaturedProducts />
     </PrivateRoute>
   }
 />

@@ -136,15 +136,15 @@ export default function Home() {
     let isMounted = true;
     (async () => {
       try {
-        const { rows } = await getProducts({ limit: 36 });
+        // Fetch products marked for homepage
+        const { rows } = await getProducts({ 
+          isLandingPage: true,
+          limit: 6 
+        });
         if (!isMounted) return;
         const list = (rows as Product[]) || [];
-        const shuffled = [...list];
-        for (let i = shuffled.length - 1; i > 0; i -= 1) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-        }
-        setHighlightProducts(shuffled.slice(0, 6));
+        // Use the selected products directly (no random shuffle)
+        setHighlightProducts(list.slice(0, 6));
       } catch (error) {
         if (isMounted) {
           setHighlightError("Impossible de charger les produits pour le moment.");

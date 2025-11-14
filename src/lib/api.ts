@@ -119,6 +119,7 @@ export type Product = {
   categorie_id: string;
   sous_categorie_id: string;
   est_actif: boolean;
+  is_landing_page?: boolean;
   seo_description?: string | null;
   seo_titre?: string | null;
   description_courte?: string | null;
@@ -180,7 +181,9 @@ export type ProductQuery = {
   subCategoryId?: string;
   page?: number;
   limit?: number; // (min 1, max 200) — aligné backend
-  order?: string; // non géré côté back pour l’instant, ignoré
+  order?: string; // non géré côté back pour l'instant, ignoré
+  isLandingPage?: boolean; // Filter by homepage featured products
+  showInactive?: boolean; // Show inactive products (for admin)
 };
 
 export async function getProducts(q: ProductQuery = {}): Promise<Paginated<Product>> {
@@ -190,7 +193,9 @@ export async function getProducts(q: ProductQuery = {}): Promise<Paginated<Produ
   if (q.subCategoryId) params.set("subCategoryId", q.subCategoryId);
   if (q.page) params.set("page", String(q.page));
   if (q.limit) params.set("limit", String(q.limit));
-  if (q.order) params.set("order", q.order); // back l’ignore, ok
+  if (q.order) params.set("order", q.order); // back l'ignore, ok
+  if (q.isLandingPage !== undefined) params.set("isLandingPage", String(q.isLandingPage));
+  if (q.showInactive) params.set("showInactive", "true");
 
   const qs = params.toString();
   return fetchPublic<Paginated<Product>>(`/crud/products${qs ? `?${qs}` : ""}`);
