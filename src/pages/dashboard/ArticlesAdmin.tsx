@@ -18,6 +18,7 @@ import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { getArticles, updateArticle, deleteArticle, type Article } from "@/lib/api";
 import { toast } from "sonner";
+import { formatArticleDate } from "@/lib/dateUtils";
 
 export default function ArticlesAdmin() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -251,8 +252,8 @@ export default function ArticlesAdmin() {
                         <Calendar className="h-4 w-4" />
                         <span>
                           {article.publie_le 
-                            ? `Publié le ${formatDate(article.publie_le)}`
-                            : `Créé le ${formatDate(article.cree_le)}`
+                            ? `Publié le ${formatArticleDate(article.publie_le)}`
+                            : `Créé le ${formatArticleDate(article.cree_le)}`
                           }
                         </span>
                       </div>

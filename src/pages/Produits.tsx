@@ -78,6 +78,19 @@ export default function Produits() {
     }
   }, []);
 
+  // Auto-scroll to product list when category is selected
+  useEffect(() => {
+    if (selectedCatIds.length > 0 && rows.length > 0) {
+      // Wait for DOM to update, then scroll
+      setTimeout(() => {
+        const productList = document.getElementById("product-list");
+        if (productList) {
+          productList.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 100);
+    }
+  }, [selectedCatIds, rows.length]);
+
   // UI state
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCatIds, setSelectedCatIds] = useState<string[]>([]);
@@ -588,7 +601,7 @@ const loadMoreCategories = async () => {
                   </p>
                 </div>
 
-                <div className="medical-grid medical-grid--3">
+                <div id="product-list" className="medical-grid medical-grid--3">
               {rows.map((product) => {
   const description = product.description ?? "";       // safe
   const rawProduct = rawById[product.id];

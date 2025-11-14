@@ -20,7 +20,7 @@ export default function CatalogueCalameo() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
+      <section className="bg-gray-50 text-gray-900 py-16 border-b border-gray-200">
         <div className="medical-container">
           <Breadcrumb items={[{ label: "Catalogue" }]} />
           <div className="mt-8">

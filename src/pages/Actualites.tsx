@@ -10,6 +10,7 @@ import { MedicalButton } from "@/components/ui/medical-button";
 import { getArticles, type Article } from "@/lib/api";
 import { safeProductImage } from "@/lib/images";
 import ImageSlider from "@/components/ui/ImageSlider";
+import { formatArticleDate } from "@/lib/dateUtils";
 
 export default function Actualites() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -52,13 +53,6 @@ export default function Actualites() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   if (isLoading) {
     return (
@@ -171,8 +165,8 @@ export default function Actualites() {
                             <Calendar className="h-4 w-4" />
                             <span>
                               {article.publie_le 
-                                ? formatDate(article.publie_le)
-                                : formatDate(article.cree_le)
+                                ? formatArticleDate(article.publie_le)
+                                : formatArticleDate(article.cree_le)
                               }
                             </span>
                           </div>

@@ -178,6 +178,7 @@ export type Product = {
   sous_categorie_id: string;
   est_actif: boolean;
   is_landing_page?: boolean;
+  position?: number | null;
   seo_description?: string | null;
   seo_titre?: string | null;
   description_courte?: string | null;

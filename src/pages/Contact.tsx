@@ -114,7 +114,7 @@ export default function Contact() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="bg-gradient-primary text-white py-16">
+      <section className="bg-gray-50 text-gray-900 py-16 border-b border-gray-200">
         <div className="medical-container">
           <Breadcrumb 
             items={[
@@ -122,10 +122,10 @@ export default function Contact() {
             ]} 
           />
           <div className="mt-8">
-            <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+            <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
               Contactez-nous
             </h1>
-            <p className="text-xl opacity-90 max-w-3xl">
+            <p className="text-xl text-gray-600 max-w-3xl">
               Notre équipe est à votre disposition pour répondre à vos questions 
               et vous accompagner dans vos démarches de santé.
             </p>

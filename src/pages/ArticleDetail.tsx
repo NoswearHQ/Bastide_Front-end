@@ -18,6 +18,7 @@ import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { MedicalCard } from "@/components/ui/MedicalCard";
 import { getArticleBySlug, getArticles, type Article } from "@/lib/api";
+import { formatArticleDate } from "@/lib/dateUtils";
 import { parseGallery, safeProductImage, safeGalleryImage } from "@/lib/images";
 
 export default function ArticleDetail() {
@@ -49,13 +50,6 @@ export default function ArticleDetail() {
   }, [articlesData, article]);
 
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
 
   const formatReadingTime = (content: string) => {
     const wordsPerMinute = 200;
@@ -210,11 +204,7 @@ export default function ArticleDetail() {
                   <div className="flex items-center gap-1">
                     <Calendar className="h-4 w-4" />
                     <span>
-                      {article.publie_le && !isNaN(Date.parse(article.publie_le))
-                        ? formatDate(article.publie_le)
-                        : article.cree_le && !isNaN(Date.parse(article.cree_le))
-                          ? formatDate(article.cree_le)
-                          : 'Date inconnue'}
+                      {formatArticleDate(article.publie_le || article.cree_le)}
                     </span>
                   </div>
                   <div className="flex items-center gap-1">
@@ -333,8 +323,8 @@ export default function ArticleDetail() {
                               <Calendar className="h-4 w-4" />
                               <span>
                                 {relatedArticle.publie_le 
-                                  ? formatDate(relatedArticle.publie_le)
-                                  : formatDate(relatedArticle.cree_le)
+                                  ? formatArticleDate(relatedArticle.publie_le)
+                                  : formatArticleDate(relatedArticle.cree_le)
                                 }
                               </span>
                             </div>

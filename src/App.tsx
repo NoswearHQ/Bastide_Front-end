@@ -33,6 +33,7 @@ import ArticleDetail from "./pages/ArticleDetail";
 import ModifierCategorie from "./pages/dashboard/ModifierCategorie";
 import ProductDetail from "./pages/ProductDetail";
 import HomepageFeaturedProducts from "./pages/dashboard/HomepageFeaturedProducts";
+import Statistics from "./pages/dashboard/Statistics";
 
 const queryClient = new QueryClient();
 
@@ -151,14 +152,22 @@ const App = () => (
     </PrivateRoute>
   }
 />
-<Route
-  path="/dashboard/homepage-products"
-  element={
-    <PrivateRoute>
-      <HomepageFeaturedProducts />
-    </PrivateRoute>
-  }
-/>
+          <Route
+            path="/dashboard/homepage-products"
+            element={
+              <PrivateRoute>
+                <HomepageFeaturedProducts />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard/statistics"
+            element={
+              <PrivateRoute>
+                <Statistics />
+              </PrivateRoute>
+            }
+          />
           {/* Catch-all */}
           <Route path="*" element={<NotFound />} />
         </Routes>

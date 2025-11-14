@@ -10,6 +10,7 @@ import { Plus, Edit, Trash2, Search, Eye, EyeOff } from "lucide-react";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { Link } from "react-router-dom";
 import { safeProductImage } from "@/lib/images";
+import { formatDateShort } from "@/lib/dateUtils";
 
 export default function ArticlesDashboard() {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -196,7 +197,7 @@ export default function ArticlesDashboard() {
                   </td>
 
                   <td className="px-6 py-3 border-b text-gray-600">
-                    {a.cree_le ? new Date(a.cree_le).toLocaleDateString('fr-FR') : "—"}
+                    {a.cree_le ? formatDateShort(a.cree_le) : "—"}
                   </td>
 
                   {/* Actions */}

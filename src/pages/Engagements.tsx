@@ -72,19 +72,19 @@ export default function Engagements() {
       </section>
 
       {/* CTA Section */}
-      <section className="medical-section bg-medical-primary text-white text-center">
+      <section className="medical-section bg-gray-50 text-center">
         <div className="medical-container">
-          <h2 className="text-4xl font-bold mb-4">
+          <h2 className="text-4xl font-bold mb-4 text-gray-900">
             Rejoignez notre mission
           </h2>
-          <p className="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-            Vous partagez notre vision de la santé, du service et de l’humain ?
+          <p className="text-xl mb-8 text-gray-600 max-w-3xl mx-auto">
+            Vous partagez notre vision de la santé, du service et de l'humain ?
             Rejoignez notre réseau et participez à notre engagement envers le
             bien-être de tous.
           </p>
           <Link
             to="/contact"
-            className="bg-white text-medical-primary px-8 py-4 rounded-lg font-medium hover:bg-gray-100 transition-colors"
+            className="inline-block bg-medical-primary text-white px-8 py-4 rounded-lg font-medium hover:bg-medical-primary-hover transition-colors"
           >
             Nous contacter
           </Link>

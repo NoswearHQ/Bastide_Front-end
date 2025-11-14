@@ -7,9 +7,9 @@
 
 @layer base {
   :root {
-    /* Medical Color Palette */
-    --medical-primary: 180 100% 28%; /* #009090 - Teal médical */
-    --medical-primary-hover: 180 100% 24%; /* Darker teal */
+    /* Medical Color Palette - Softer tones */
+    --medical-primary: 180 65% 35%; /* Softer teal médical */
+    --medical-primary-hover: 180 65% 30%; /* Darker teal */
     --medical-accent: 348 98% 44%; /* #e4072f - Rouge médical */
     --medical-accent-hover: 348 98% 38%; /* Darker red */
     

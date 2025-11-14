@@ -41,7 +41,7 @@ export default function Services() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Service 1 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
@@ -92,7 +92,44 @@ export default function Services() {
 
             {/* Service 3 - Removed, replaced by StoreLocations component below */}
 
-            {/* Service 4 */}
+            {/* Service 4 - Assistante respiratoire */}
+            <div className="relative group rounded-2xl overflow-hidden shadow-md">
+              <video
+                src="/images/airoxyimage.webm"
+                className="w-full h-80 object-cover transform group-hover:scale-105 transition duration-500"
+                autoPlay
+                loop
+                muted
+                playsInline
+              />
+              <div className="absolute inset-0 bg-black/40 flex flex-col justify-end items-center p-6 text-center text-white">
+                <h3 className="text-lg font-semibold mb-3">
+                  Assistante respiratoire
+                </h3>
+                <a
+                  href="https://airoxy.tn/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={async () => {
+                    // Track service click
+                    try {
+                      await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"}/api/statistics/service-click`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ service_name: "Assistante respiratoire" }),
+                      });
+                    } catch (err) {
+                      console.error("Failed to track service click:", err);
+                    }
+                  }}
+                  className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
+                >
+                  Découvrir
+                </a>
+              </div>
+            </div>
+
+            {/* Service 5 */}
             <div className="relative group rounded-2xl overflow-hidden shadow-md">
               <img
                 src={safeProductImage("images/s4.webp")}

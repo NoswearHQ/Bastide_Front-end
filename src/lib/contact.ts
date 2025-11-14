@@ -71,6 +71,23 @@ export async function handleSmartOrder({
     const message = `Bonjour 👋, je souhaite commander le produit suivant :\n\n${productName}\n${productReference ? `Référence: ${productReference}\n` : ""}${productPrice ? `Prix: ${productPrice}\n` : ""}\n\nMerci de me confirmer la disponibilité.`;
     const encodedMsg = encodeURIComponent(message);
     const url = `https://wa.me/${phoneE164.replace(/\D/g, "")}?text=${encodedMsg}`;
+    
+    // Track WhatsApp order
+    try {
+      await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"}/api/statistics/product-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_title: productName,
+          product_reference: productReference,
+          customer_phone: "", // Not available on mobile
+          order_type: "whatsapp",
+        }),
+      });
+    } catch (err) {
+      console.error("Failed to track WhatsApp order:", err);
+    }
+    
     window.open(url, "_blank");
     return;
   }
