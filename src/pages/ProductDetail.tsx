@@ -31,6 +31,28 @@ export default function ProductDetail() {
     }
   }, [error]);
 
+  // Disable browser scroll restoration for product detail pages
+  useEffect(() => {
+    if (typeof window !== "undefined" && "scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual";
+    }
+  }, []);
+
+  // Scroll to top immediately when component mounts or product ID changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [productId]);
+
+  // Ensure scroll to top after product data is loaded (in case of delayed rendering)
+  useEffect(() => {
+    if (product && !isLoading) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: 0, behavior: "instant" });
+      });
+    }
+  }, [product, isLoading]);
+
   const formatPrice = (price: string | null) => {
     if (!price) return "Prix sur demande";
     const numPrice = parseFloat(price);
