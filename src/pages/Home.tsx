@@ -538,16 +538,8 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
             onClick={async () => {
-              // Track service click
-              try {
-                await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000"}/api/statistics/service-click`, {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({ service_name: "Assistante respiratoire" }),
-                });
-              } catch (err) {
-                console.error("Failed to track service click:", err);
-              }
+              // Statistics tracking temporarily disabled
+              // TODO: Re-enable statistics tracking after fixing order issues
             }}
             className="bg-white text-gray-900 font-medium py-2 px-6 rounded-full hover:bg-gray-100 transition"
           >
