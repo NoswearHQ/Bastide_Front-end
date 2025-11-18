@@ -135,10 +135,12 @@ export default function ProductDetail() {
     );
   }
 
-  // Generate SEO-friendly URL
-  const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-  const seoUrl = `/produit/${product.id}-${seoSlug}`;
-  const productUrl = `https://bastide.tn${seoUrl}`;
+  // Generate SEO-friendly URL (memoized to prevent infinite loops)
+  const productUrl = useMemo(() => {
+    const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    const seoUrl = `/produit/${product.id}-${seoSlug}`;
+    return `https://bastide.tn${seoUrl}`;
+  }, [product.id, product.slug, product.titre]);
 
   // Prepare all product images for JSON-LD
   const productImages = useMemo(() => {
@@ -154,7 +156,7 @@ export default function ProductDetail() {
       }
     });
     return images.length > 0 ? images : [safeProductImage(null)]; // Fallback to placeholder
-  }, [product]);
+  }, [product.image_miniature, product.galerie_json]);
 
   // Generate JSON-LD structured data
   const jsonLd = useMemo(() => {
@@ -214,11 +216,23 @@ export default function ProductDetail() {
     }
 
     return jsonLdData;
-  }, [product, productImages, productUrl]);
+  }, [
+    product.titre,
+    product.seo_description,
+    product.description_courte,
+    product.description_html,
+    product.prix,
+    product.est_actif,
+    product.reference,
+    product.id,
+    product.marque,
+    productImages,
+    productUrl
+  ]);
 
   // Inject JSON-LD into document head
   useEffect(() => {
-    if (!product) return;
+    if (!product || !jsonLd) return;
 
     // Remove existing product JSON-LD if any
     const existingScript = document.querySelector('script[type="application/ld+json"][data-product-jsonld]');
@@ -240,7 +254,7 @@ export default function ProductDetail() {
         scriptToRemove.remove();
       }
     };
-  }, [jsonLd, product]);
+  }, [jsonLd]);
 
   return (
     <Layout>
