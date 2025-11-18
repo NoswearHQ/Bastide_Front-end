@@ -135,35 +135,41 @@ export default function ProductDetail() {
     );
   }
 
-  // Generate SEO-friendly URL (memoized to prevent infinite loops)
-  const productUrl = useMemo(() => {
+  // Generate JSON-LD structured data - calculate everything in one useMemo to avoid dependency loops
+  const jsonLd = useMemo(() => {
+    if (!product) return null;
+
+    // Generate SEO-friendly URL
     const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
     const seoUrl = `/produit/${product.id}-${seoSlug}`;
-    return `https://bastide.tn${seoUrl}`;
-  }, [product.id, product.slug, product.titre]);
+    const productUrl = `https://bastide.tn${seoUrl}`;
 
-  // Prepare all product images for JSON-LD
-  const productImages = useMemo(() => {
+    // Prepare all product images
     const images: string[] = [];
     if (product.image_miniature) {
-      images.push(safeProductImage(product.image_miniature));
+      const imgUrl = safeProductImage(product.image_miniature);
+      if (imgUrl) images.push(imgUrl);
     }
-    const gallery = parseGallery(product.galerie_json);
-    gallery.forEach((img) => {
-      const fullUrl = safeProductImage(img);
-      if (!images.includes(fullUrl)) {
-        images.push(fullUrl);
-      }
-    });
-    return images.length > 0 ? images : [safeProductImage(null)]; // Fallback to placeholder
-  }, [product.image_miniature, product.galerie_json]);
+    
+    // Parse gallery and add images
+    try {
+      const gallery = parseGallery(product.galerie_json);
+      gallery.forEach((img) => {
+        const fullUrl = safeProductImage(img);
+        if (fullUrl && !images.includes(fullUrl)) {
+          images.push(fullUrl);
+        }
+      });
+    } catch (e) {
+      // Ignore gallery parsing errors
+    }
+    
+    const productImages = images.length > 0 ? images : [safeProductImage(null) || ''];
 
-  // Generate JSON-LD structured data
-  const jsonLd = useMemo(() => {
     // Get description (strip HTML tags and escape for JSON)
     const description = product.seo_description || 
                        product.description_courte || 
-                       product.description_html?.replace(/<[^>]*>/g, '').trim() || 
+                       (product.description_html ? product.description_html.replace(/<[^>]*>/g, '').trim() : '') || 
                        `Découvrez ${product.titre} chez Bastide Tunisie.`;
     
     // Clean description for JSON (remove HTML, escape quotes)
@@ -176,7 +182,7 @@ export default function ProductDetail() {
     // Format price (remove currency symbol, use dot separator, 3 decimal places)
     // Example: 129.000 (not 129,000 or 129.00)
     const formattedPrice = product.prix 
-      ? parseFloat(product.prix).toFixed(3)
+      ? parseFloat(String(product.prix)).toFixed(3)
       : null;
 
     // Determine availability based on est_actif
@@ -188,19 +194,23 @@ export default function ProductDetail() {
     const jsonLdData: any = {
       "@context": "https://schema.org/",
       "@type": "Product",
-      "name": product.titre,
-      "image": productImages,
+      "name": product.titre || '',
+      "image": productImages.length > 0 ? productImages : undefined,
       "description": cleanDescription,
-      "sku": product.reference || product.id,
+      "sku": product.reference || product.id || '',
       "offers": {
         "@type": "Offer",
         "url": productUrl,
         "priceCurrency": "TND",
-        "price": formattedPrice || undefined,
         "availability": availability,
         "itemCondition": "https://schema.org/NewCondition"
       }
     };
+
+    // Add price if available
+    if (formattedPrice) {
+      jsonLdData.offers.price = formattedPrice;
+    }
 
     // Add brand if available
     if (product.marque) {
@@ -210,24 +220,21 @@ export default function ProductDetail() {
       };
     }
 
-    // Remove price from offers if not available
-    if (!formattedPrice) {
-      delete jsonLdData.offers.price;
-    }
-
     return jsonLdData;
   }, [
-    product.titre,
-    product.seo_description,
-    product.description_courte,
-    product.description_html,
-    product.prix,
-    product.est_actif,
-    product.reference,
-    product.id,
-    product.marque,
-    productImages,
-    productUrl
+    product?.id,
+    product?.slug,
+    product?.titre,
+    product?.seo_description,
+    product?.description_courte,
+    product?.description_html,
+    product?.prix,
+    product?.est_actif,
+    product?.reference,
+    product?.marque,
+    product?.image_miniature,
+    // Stringify galerie_json to stabilize array/object reference
+    product?.galerie_json ? JSON.stringify(product.galerie_json) : null
   ]);
 
   // Inject JSON-LD into document head
@@ -240,12 +247,16 @@ export default function ProductDetail() {
       existingScript.remove();
     }
 
-    // Create and inject new JSON-LD script
-    const script = document.createElement('script');
-    script.type = 'application/ld+json';
-    script.setAttribute('data-product-jsonld', 'true');
-    script.textContent = JSON.stringify(jsonLd, null, 2);
-    document.head.appendChild(script);
+    try {
+      // Create and inject new JSON-LD script
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.setAttribute('data-product-jsonld', 'true');
+      script.textContent = JSON.stringify(jsonLd);
+      document.head.appendChild(script);
+    } catch (error) {
+      console.error('Error injecting JSON-LD:', error);
+    }
 
     // Cleanup on unmount
     return () => {
