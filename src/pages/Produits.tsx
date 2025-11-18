@@ -684,6 +684,7 @@ const loadMoreCategories = async () => {
         productName: product.name,
         productReference: product.reference || rawProduct?.reference || undefined,
         productPrice: product.priceLabel !== "—" ? product.priceLabel : undefined,
+        productId: product.id, // Pass product ID for better tracking
       });
     }}
   >
@@ -1052,6 +1053,7 @@ function ProductDetailsView({ product }: { product: ProductDetail }) {
               productName: product.titre,
               productReference: product.reference || undefined,
               productPrice: priceLabel,
+              productId: product.id, // Pass product ID for better tracking
             });
           }}
         >

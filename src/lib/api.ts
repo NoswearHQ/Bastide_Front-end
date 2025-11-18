@@ -45,11 +45,28 @@ async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
       } else if (errorData.message) {
         errorMessage = errorData.message;
       }
+      
+      // Include detailed validation errors if available
+      if (errorData.details && Array.isArray(errorData.details)) {
+        const details = errorData.details.map((d: any) => 
+          `${d.field}: ${d.message}`
+        ).join('; ');
+        errorMessage += ` (${details})`;
+      }
     } catch {
       // If JSON parsing fails, use status text
       const text = await res.text().catch(() => "");
       if (text) errorMessage = text;
     }
+    
+    // Log full error details to console for debugging
+    console.error('API Error Details:', {
+      status: res.status,
+      statusText: res.statusText,
+      url,
+      errorData,
+      requestBody: init?.body,
+    });
     
     // Check if it's an expired token error in the response body
     if (
@@ -447,11 +464,32 @@ export type OrderRequest = {
   phone: string;
   product_name: string;
   product_reference?: string;
+  product_id?: number | string; // Optional product ID for better tracking
   subject?: string;
 };
 
 export async function sendOrderEmail(order: OrderRequest): Promise<{ success: boolean; message?: string; error?: string }> {
   return fetchPublic<{ success: boolean; message?: string; error?: string }>(`/api/orders/send`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(order),
+  });
+}
+
+// ---------- Order Statistics Tracking ----------
+
+export type TrackOrderRequest = {
+  product_id?: number | string | null;
+  product_reference?: string | null;
+  product_title: string;
+  customer_email?: string | null;
+  customer_phone: string;
+  order_type: "mail" | "whatsapp";
+  fingerprint?: string; // Unique identifier to prevent duplicates
+};
+
+export async function trackProductOrder(order: TrackOrderRequest): Promise<{ success: boolean; id?: number; duplicate?: boolean; message?: string }> {
+  return fetchPublic<{ success: boolean; id?: number; duplicate?: boolean; message?: string }>(`/api/statistics/product-order`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(order),

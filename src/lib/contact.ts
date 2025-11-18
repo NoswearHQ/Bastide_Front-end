@@ -1,7 +1,7 @@
 // Device detection and contact redirection utilities
 import { toast } from "sonner";
 import Swal from "sweetalert2";
-import { sendOrderEmail, type OrderRequest } from "./api";
+import { sendOrderEmail, type OrderRequest, trackProductOrder } from "./api";
 
 export function isMobileDevice(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -58,13 +58,73 @@ type SmartOrderParams = {
   productReference?: string;
   productPrice?: string;
   phoneE164?: string;
+  productId?: number | string; // Optional product ID for better tracking
 };
+
+/**
+ * Generate a unique fingerprint for duplicate detection
+ * Uses sessionStorage to prevent duplicate tracking on page refresh
+ */
+function generateOrderFingerprint(productId: string | number | undefined, productName: string, orderType: "mail" | "whatsapp"): string {
+  const timestamp = Date.now();
+  const sessionKey = `order_${orderType}_${productId || productName}_${timestamp}`;
+  
+  // Check if we already tracked this order in this session
+  const existingFingerprint = sessionStorage.getItem(sessionKey);
+  if (existingFingerprint) {
+    return existingFingerprint;
+  }
+  
+  // Generate new fingerprint
+  const fingerprint = `${orderType}_${productId || productName}_${timestamp}_${Math.random().toString(36).substring(2, 15)}`;
+  sessionStorage.setItem(sessionKey, fingerprint);
+  
+  // Clean up old sessionStorage entries (keep last 10)
+  try {
+    const keys = Object.keys(sessionStorage).filter(k => k.startsWith(`order_${orderType}_`));
+    if (keys.length > 10) {
+      keys.slice(0, keys.length - 10).forEach(k => sessionStorage.removeItem(k));
+    }
+  } catch (e) {
+    // Ignore sessionStorage errors
+  }
+  
+  return fingerprint;
+}
+
+/**
+ * Track WhatsApp order (non-blocking, fire-and-forget)
+ */
+async function trackWhatsAppOrder(params: {
+  productId?: number | string;
+  productReference?: string;
+  productName: string;
+  productPrice?: string;
+}): Promise<void> {
+  try {
+    const fingerprint = generateOrderFingerprint(params.productId, params.productName, "whatsapp");
+    
+    await trackProductOrder({
+      product_id: params.productId ? String(params.productId) : null,
+      product_reference: params.productReference || null,
+      product_title: params.productName,
+      customer_email: null, // WhatsApp orders don't have email
+      customer_phone: "", // Will be filled by user in WhatsApp
+      order_type: "whatsapp",
+      fingerprint,
+    });
+  } catch (error) {
+    // Silently fail - tracking should never block the user flow
+    console.warn("Failed to track WhatsApp order:", error);
+  }
+}
 
 export async function handleSmartOrder({
   productName,
   productReference,
   productPrice,
   phoneE164 = "+21629380898",
+  productId,
 }: SmartOrderParams): Promise<void> {
   // Mobile: Open WhatsApp directly
   if (isMobileDevice()) {
@@ -72,8 +132,15 @@ export async function handleSmartOrder({
     const encodedMsg = encodeURIComponent(message);
     const url = `https://wa.me/${phoneE164.replace(/\D/g, "")}?text=${encodedMsg}`;
     
-    // Statistics tracking temporarily disabled
-    // TODO: Re-enable statistics tracking after fixing order issues
+    // Track WhatsApp order BEFORE opening WhatsApp (non-blocking)
+    trackWhatsAppOrder({
+      productId,
+      productReference,
+      productName,
+      productPrice,
+    }).catch(() => {
+      // Ignore errors - tracking is non-critical
+    });
     
     window.open(url, "_blank");
     return;
@@ -195,6 +262,7 @@ export async function handleSmartOrder({
       phone: formValues.phone,
       product_name: productName,
       product_reference: productReference || undefined,
+      product_id: productId, // Pass product ID for better tracking
       subject: formValues.subject,
     };
 
@@ -202,6 +270,9 @@ export async function handleSmartOrder({
 
     // CRITICAL: Only show success if backend explicitly returns success: true
     if (response.success === true) {
+      // Email order tracking is handled automatically by the backend after successful email send
+      // No need to track here - the OrderController handles it
+      
       await Swal.fire({
         icon: "success",
         title: "Commande envoyée !",

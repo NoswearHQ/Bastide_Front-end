@@ -66,6 +66,7 @@ export default function ProductDetail() {
       productName: product.titre,
       productReference: product.reference || undefined,
       productPrice: product.prix ? formatPrice(product.prix) : undefined,
+      productId: product.id, // Pass product ID for better tracking
     });
   };
 

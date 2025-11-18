@@ -4,25 +4,31 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { BarChart3, ShoppingCart, MousePointerClick, Download, Calendar } from "lucide-react";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { toast } from "sonner";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+import { fetchWithAuth } from "@/lib/api";
 
 async function fetchStats(startDate?: string, endDate?: string) {
   const params = new URLSearchParams();
   if (startDate) params.set("start_date", startDate);
   if (endDate) params.set("end_date", endDate);
-  const res = await fetch(`${API_BASE}/api/statistics/stats?${params.toString()}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  const url = `/api/statistics/stats?${params.toString()}`;
+  try {
+    return await fetchWithAuth(url);
+  } catch (error) {
+    console.error('Statistics fetch failed:', error);
+    throw error;
+  }
 }
 
 async function fetchOrders(page = 1, limit = 50, startDate?: string, endDate?: string) {
   const params = new URLSearchParams({ page: String(page), limit: String(limit) });
   if (startDate) params.set("start_date", startDate);
   if (endDate) params.set("end_date", endDate);
-  const res = await fetch(`${API_BASE}/api/statistics/orders?${params.toString()}`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
+  try {
+    return await fetchWithAuth(`/api/statistics/orders?${params.toString()}`);
+  } catch (error) {
+    console.error('Orders fetch failed:', error);
+    throw error;
+  }
 }
 
 function exportToCSV(data: any[], filename: string) {
@@ -58,9 +64,10 @@ export default function Statistics() {
   const [ordersPage, setOrdersPage] = useState(1);
   const ordersPerPage = 50;
 
-  const { data: stats, isLoading: statsLoading, refetch: refetchStats } = useQuery({
+  const { data: stats, isLoading: statsLoading, error: statsError, refetch: refetchStats } = useQuery({
     queryKey: ["statistics", startDate, endDate],
     queryFn: () => fetchStats(startDate || undefined, endDate || undefined),
+    retry: 1,
   });
 
   const { data: ordersData, isLoading: ordersLoading, refetch: refetchOrders } = useQuery({
@@ -292,6 +299,14 @@ export default function Statistics() {
               )}
             </div>
           </>
+        ) : statsError ? (
+          <div className="text-center py-12">
+            <div className="text-red-600 font-semibold mb-2">Erreur lors du chargement des statistiques</div>
+            <div className="text-sm text-gray-500 mb-4">{statsError.message}</div>
+            <MedicalButton variant="outline" onClick={() => refetchStats()}>
+              Réessayer
+            </MedicalButton>
+          </div>
         ) : (
           <div className="text-center py-12 text-gray-500">
             Erreur lors du chargement des statistiques
