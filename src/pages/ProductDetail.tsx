@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ShoppingCart, ArrowLeft, Info, CheckCircle, XCircle } from "lucide-react";
@@ -7,7 +7,7 @@ import Seo from "@/components/Seo";
 import Breadcrumb from "@/components/ui/Breadcrumb";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { getProductById, type ProductDetail } from "@/lib/api";
-import { safeProductImage, parseGallery } from "@/lib/images";
+import { safeProductImage } from "@/lib/images";
 import { handleSmartOrder } from "@/lib/contact";
 
 export default function ProductDetail() {
@@ -135,144 +135,16 @@ export default function ProductDetail() {
     );
   }
 
-  // Generate JSON-LD structured data - calculate everything in one useMemo to avoid dependency loops
-  const jsonLd = useMemo(() => {
-    if (!product) return null;
-
-    // Generate SEO-friendly URL
-    const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-    const seoUrl = `/produit/${product.id}-${seoSlug}`;
-    const productUrl = `https://bastide.tn${seoUrl}`;
-
-    // Prepare all product images
-    const images: string[] = [];
-    if (product.image_miniature) {
-      const imgUrl = safeProductImage(product.image_miniature);
-      if (imgUrl) images.push(imgUrl);
-    }
-    
-    // Parse gallery and add images
-    try {
-      const gallery = parseGallery(product.galerie_json);
-      gallery.forEach((img) => {
-        const fullUrl = safeProductImage(img);
-        if (fullUrl && !images.includes(fullUrl)) {
-          images.push(fullUrl);
-        }
-      });
-    } catch (e) {
-      // Ignore gallery parsing errors
-    }
-    
-    const productImages = images.length > 0 ? images : [safeProductImage(null) || ''];
-
-    // Get description (strip HTML tags and escape for JSON)
-    const description = product.seo_description || 
-                       product.description_courte || 
-                       (product.description_html ? product.description_html.replace(/<[^>]*>/g, '').trim() : '') || 
-                       `Découvrez ${product.titre} chez Bastide Tunisie.`;
-    
-    // Clean description for JSON (remove HTML, escape quotes)
-    const cleanDescription = description
-      .replace(/<[^>]*>/g, '') // Remove HTML tags
-      .replace(/"/g, '\\"') // Escape double quotes
-      .replace(/\n/g, ' ') // Replace newlines with spaces
-      .trim();
-
-    // Format price (remove currency symbol, use dot separator, 3 decimal places)
-    // Example: 129.000 (not 129,000 or 129.00)
-    const formattedPrice = product.prix 
-      ? parseFloat(String(product.prix)).toFixed(3)
-      : null;
-
-    // Determine availability based on est_actif
-    const availability = product.est_actif 
-      ? 'https://schema.org/InStock' 
-      : 'https://schema.org/OutOfStock';
-
-    // Build JSON-LD object
-    const jsonLdData: any = {
-      "@context": "https://schema.org/",
-      "@type": "Product",
-      "name": product.titre || '',
-      "image": productImages.length > 0 ? productImages : undefined,
-      "description": cleanDescription,
-      "sku": product.reference || product.id || '',
-      "offers": {
-        "@type": "Offer",
-        "url": productUrl,
-        "priceCurrency": "TND",
-        "availability": availability,
-        "itemCondition": "https://schema.org/NewCondition"
-      }
-    };
-
-    // Add price if available
-    if (formattedPrice) {
-      jsonLdData.offers.price = formattedPrice;
-    }
-
-    // Add brand if available
-    if (product.marque) {
-      jsonLdData.brand = {
-        "@type": "Brand",
-        "name": product.marque
-      };
-    }
-
-    return jsonLdData;
-  }, [
-    product?.id,
-    product?.slug,
-    product?.titre,
-    product?.seo_description,
-    product?.description_courte,
-    product?.description_html,
-    product?.prix,
-    product?.est_actif,
-    product?.reference,
-    product?.marque,
-    product?.image_miniature,
-    // Stringify galerie_json to stabilize array/object reference
-    product?.galerie_json ? JSON.stringify(product.galerie_json) : null
-  ]);
-
-  // Inject JSON-LD into document head
-  useEffect(() => {
-    if (!product || !jsonLd) return;
-
-    // Remove existing product JSON-LD if any
-    const existingScript = document.querySelector('script[type="application/ld+json"][data-product-jsonld]');
-    if (existingScript) {
-      existingScript.remove();
-    }
-
-    try {
-      // Create and inject new JSON-LD script
-      const script = document.createElement('script');
-      script.type = 'application/ld+json';
-      script.setAttribute('data-product-jsonld', 'true');
-      script.textContent = JSON.stringify(jsonLd);
-      document.head.appendChild(script);
-    } catch (error) {
-      console.error('Error injecting JSON-LD:', error);
-    }
-
-    // Cleanup on unmount
-    return () => {
-      const scriptToRemove = document.querySelector('script[type="application/ld+json"][data-product-jsonld]');
-      if (scriptToRemove) {
-        scriptToRemove.remove();
-      }
-    };
-  }, [jsonLd]);
+  // Generate SEO-friendly URL
+  const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+  const seoUrl = `/produit/${product.id}-${seoSlug}`;
 
   return (
     <Layout>
       <Seo
         title={`${product.titre} - Bastide Tunisie`}
         description={product.seo_description || product.description_courte || `Découvrez ${product.titre} chez Bastide Tunisie. ${product.reference ? `Référence: ${product.reference}.` : ""} ${product.prix ? `Prix: ${formatPrice(product.prix)}.` : ""}`}
-        canonical={productUrl}
+        canonical={`https://bastide.tn${seoUrl}`}
         image={product.image_miniature ? safeProductImage(product.image_miniature) : undefined}
         type="product"
       />
