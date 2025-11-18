@@ -104,18 +104,24 @@ async function trackWhatsAppOrder(params: {
   try {
     const fingerprint = generateOrderFingerprint(params.productId, params.productName, "whatsapp");
     
+    // Track the WhatsApp click - we don't have phone/email since user will provide it in WhatsApp
     await trackProductOrder({
       product_id: params.productId ? String(params.productId) : null,
       product_reference: params.productReference || null,
       product_title: params.productName,
       customer_email: null, // WhatsApp orders don't have email
-      customer_phone: "", // Will be filled by user in WhatsApp
+      customer_phone: "", // Backend will use placeholder "WhatsApp" for tracking
       order_type: "whatsapp",
       fingerprint,
     });
+    
+    console.log("WhatsApp order click tracked:", {
+      productName: params.productName,
+      productId: params.productId,
+    });
   } catch (error) {
-    // Silently fail - tracking should never block the user flow
-    console.warn("Failed to track WhatsApp order:", error);
+    // Log error but don't block - tracking should never block the user flow
+    console.error("Failed to track WhatsApp order:", error);
   }
 }
 
@@ -132,16 +138,19 @@ export async function handleSmartOrder({
     const encodedMsg = encodeURIComponent(message);
     const url = `https://wa.me/${phoneE164.replace(/\D/g, "")}?text=${encodedMsg}`;
     
-    // Track WhatsApp order BEFORE opening WhatsApp (non-blocking)
+    // Track WhatsApp click BEFORE opening WhatsApp (non-blocking, fire-and-forget)
+    // This tracks the click/redirect, not the actual order (which happens in WhatsApp)
     trackWhatsAppOrder({
       productId,
       productReference,
       productName,
       productPrice,
-    }).catch(() => {
-      // Ignore errors - tracking is non-critical
+    }).catch((error) => {
+      // Log error but don't block - tracking failures should never prevent WhatsApp from opening
+      console.warn("WhatsApp tracking failed (non-critical):", error);
     });
     
+    // Open WhatsApp immediately (don't wait for tracking)
     window.open(url, "_blank");
     return;
   }
