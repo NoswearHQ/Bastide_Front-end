@@ -324,6 +324,7 @@ export type ProductDetail = Product & {
     // nouveaux champs renvoyés par le back
     categorie_nom?: string | null;
     sous_categorie_nom?: string | null;
+    marque?: string | null; // Brand name for Schema.org structured data
   };
   
   // Adapte API_BASE à ta config (même base que getProducts)
