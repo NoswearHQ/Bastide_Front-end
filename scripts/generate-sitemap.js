@@ -62,7 +62,48 @@ async function fetchAllArticles() {
   }
 }
 
-function generateSitemap(articles = []) {
+async function fetchAllProducts() {
+  try {
+    console.log('🔍 Fetching products from API...');
+    
+    let allProducts = [];
+    let page = 1;
+    const limit = 100; // Récupérer 100 produits à la fois
+    
+    while (true) {
+      const response = await fetch(`${API_BASE}/crud/products?page=${page}&limit=${limit}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: Failed to fetch products`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.rows || data.rows.length === 0) {
+        break; // Plus de produits
+      }
+      
+      allProducts = allProducts.concat(data.rows);
+      console.log(`  📦 Fetched ${data.rows.length} products from page ${page}`);
+      
+      // Si on a récupéré tous les produits, on s'arrête
+      if (allProducts.length >= data.total) {
+        break;
+      }
+      
+      page++;
+    }
+    
+    console.log(`✅ Total products fetched: ${allProducts.length}`);
+    return allProducts;
+    
+  } catch (error) {
+    console.error('❌ Error fetching products:', error);
+    return [];
+  }
+}
+
+function generateSitemap(articles = [], products = []) {
   console.log('\n📝 Generating sitemap.xml...');
   
   let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
@@ -79,6 +120,19 @@ function generateSitemap(articles = []) {
 `;
   });
 
+  // Ajouter les produits (format: /produit/{id}-{slug})
+  products.forEach(product => {
+    if (product.slug && product.est_actif) {
+      const productUrl = `${SITE_BASE}/produit/${product.id}-${product.slug}`;
+      sitemap += `  <url>
+    <loc>${productUrl}</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+`;
+    }
+  });
+
   // Ajouter les articles
   articles.forEach(article => {
     if (article.slug) {
@@ -93,7 +147,11 @@ function generateSitemap(articles = []) {
 
   sitemap += '</urlset>\n';
   
-  console.log(`✅ Generated sitemap with ${staticUrls.length + articles.length} URLs`);
+  const totalUrls = staticUrls.length + products.length + articles.length;
+  console.log(`✅ Generated sitemap with ${totalUrls} URLs`);
+  console.log(`   - Static URLs: ${staticUrls.length}`);
+  console.log(`   - Product URLs: ${products.length}`);
+  console.log(`   - Article URLs: ${articles.length}`);
   
   return sitemap;
 }
@@ -102,19 +160,23 @@ async function main() {
   try {
     console.log('🚀 Starting sitemap generation...\n');
     
-    // Fetch articles
-    const articles = await fetchAllArticles();
+    // Fetch articles and products in parallel
+    const [articles, products] = await Promise.all([
+      fetchAllArticles(),
+      fetchAllProducts(),
+    ]);
     
     // Generate sitemap
-    const sitemap = generateSitemap(articles);
+    const sitemap = generateSitemap(articles, products);
     
     // Write to public directory
     const outputPath = path.join(__dirname, '..', 'public', 'sitemap.xml');
     fs.writeFileSync(outputPath, sitemap, 'utf8');
     
     console.log(`\n✅ Sitemap generated successfully at: ${outputPath}`);
-    console.log(`📊 Total URLs: ${staticUrls.length + articles.length}`);
+    console.log(`📊 Total URLs: ${staticUrls.length + products.length + articles.length}`);
     console.log('   - Static URLs:', staticUrls.length);
+    console.log('   - Product URLs:', products.length);
     console.log('   - Article URLs:', articles.length);
     
   } catch (error) {
