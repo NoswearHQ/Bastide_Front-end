@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/dashboard/DashboardLayout";
-import { getCategories, getProductById, fetchWithAuth } from "@/lib/api";
+import { getCategories, getProductById, fetchWithAuth, ProduitsDetails } from "@/lib/api";
 import { imageUrl, safeProductImage, parseGallery } from "@/lib/images";
 import { MedicalButton } from "@/components/ui/medical-button";
 import { Save, CheckCircle, X } from "lucide-react";
+import ProductDetailsForm from "@/components/admin/ProductDetailsForm";
 
 export default function ModifierProduit() {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,7 @@ export default function ModifierProduit() {
   const [titre, setTitre] = useState("");
   const [reference, setReference] = useState("");
   const [description, setDescription] = useState("");
+  const [descriptionCourte, setDescriptionCourte] = useState("");
   const [categorieId, setCategorieId] = useState("");
   const [prix, setPrix] = useState("");
   const [estActif, setEstActif] = useState(true);
@@ -24,6 +26,7 @@ export default function ModifierProduit() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [details, setDetails] = useState<ProduitsDetails | null>(null);
 
   // --- Charger les catégories ---
   useEffect(() => {
@@ -39,6 +42,7 @@ export default function ModifierProduit() {
         setTitre(data.titre || "");
         setReference(data.reference || "");
         setDescription(data.description_html || "");
+        setDescriptionCourte(data.description_courte || "");
         setCategorieId(String(data.categorie_id || ""));
         setPrix(data.prix || "");
         setEstActif(Boolean(data.est_actif));
@@ -49,6 +53,13 @@ export default function ModifierProduit() {
         // Charger galerie
         const parsed = parseGallery(data.galerie_json) || [];
         setGallery(Array.from(new Set(parsed)));
+
+        // Charger ProduitsDetails
+        if (data.details) {
+          setDetails(data.details);
+        } else {
+          setDetails(null);
+        }
       })
       .catch((err) => {
         console.error(err);
@@ -87,25 +98,38 @@ export default function ModifierProduit() {
     formData.append("titre", titre);
     formData.append("reference", reference);
     formData.append("description_html", description);
+    formData.append("description_courte", descriptionCourte);
     formData.append("categorie_id", categorieId);
     formData.append("prix", prix);
     formData.append("est_actif", estActif ? "true" : "false");
     formData.append("galerie_json", JSON.stringify(gallery));
 
+    // Add ProduitsDetails fields
+    // Only send fields that are still in the form (brand and availability)
+    // Removed fields (SKU, description_seo, rating_value, rating_count, gtin, mpn, condition, price_valid_until, category_schema) are not sent
+    if (details) {
+      if (details.brand !== null && details.brand !== undefined) {
+        formData.append("details_brand", details.brand);
+      }
+    }
+    // Always set availability to "InStock"
+    formData.append("details_availability", "InStock");
+
     if (newMiniature) formData.append("image_miniature", newMiniature);
     newImages.forEach((img) => formData.append("images[]", img));
 
     try {
-      await fetchWithAuth(`/crud/products/${id}`, {
+      const result = await fetchWithAuth<{ ok: boolean }>(`/crud/products/${id}`, {
         method: "POST", // ← on envoie POST + _method=PATCH
         body: formData,
       });
       
+      console.log("✅ Product updated successfully", result);
       setSuccess(true);
       setTimeout(() => navigate("/dashboard/produits"), 2000);
-    } catch (err) {
-      console.error(err);
-      setError("Erreur lors de la mise à jour du produit");
+    } catch (err: any) {
+      console.error("❌ Error updating product:", err);
+      setError(err.message || "Erreur lors de la mise à jour du produit");
     }
   }
 
@@ -160,6 +184,20 @@ export default function ModifierProduit() {
               value={reference}
               onChange={(e) => setReference(e.target.value)}
               className="w-full border rounded-lg px-3 py-2 focus:ring-medical-primary focus:border-medical-primary"
+            />
+          </div>
+
+          {/* Description courte */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description courte
+            </label>
+            <textarea
+              value={descriptionCourte}
+              onChange={(e) => setDescriptionCourte(e.target.value)}
+              rows={3}
+              className="w-full border rounded-lg px-3 py-2 focus:ring-medical-primary focus:border-medical-primary"
+              placeholder="Description courte du produit"
             />
           </div>
 
@@ -306,6 +344,12 @@ export default function ModifierProduit() {
             />
             <label className="text-gray-700">Produit visible (en ligne)</label>
           </div>
+
+          {/* Product Details Form */}
+          <ProductDetailsForm
+            details={details}
+            onChange={(updatedDetails) => setDetails(updatedDetails)}
+          />
 
           {/* Bouton submit */}
           <div className="pt-4">

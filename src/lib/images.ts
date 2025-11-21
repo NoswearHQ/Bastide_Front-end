@@ -1,6 +1,6 @@
 // src/lib/images.ts
 const API_BASE = (import.meta as any).env.VITE_API_BASE_URL || "https://api.bastide.com.tn";
-console.log('🔧 API_BASE in images.ts:', API_BASE);
+//console.log('🔧 API_BASE in images.ts:', API_BASE);
 
 /**
  * Construit une URL absolue vers le backend public /images à partir d'un chemin relatif
@@ -77,13 +77,13 @@ export function safeProductImage(imagePath?: string | null): string {
   if (result.startsWith('http')) {
     fetch(result, { method: 'HEAD' })
       .then(response => {
-        console.log(`🔍 Image accessibility test: ${result} - Status: ${response.status}`);
+        //console.log(`🔍 Image accessibility test: ${result} - Status: ${response.status}`);
         if (!response.ok) {
-          console.log(`❌ Image not accessible: ${result} - Status: ${response.status}`);
+          //console.log(`❌ Image not accessible: ${result} - Status: ${response.status}`);
         }
       })
       .catch(error => {
-        console.log(`❌ Image fetch error: ${result} - Error:`, error);
+        //console.log(`❌ Image fetch error: ${result} - Error:`, error);
       });
   }
   

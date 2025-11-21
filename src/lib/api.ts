@@ -314,6 +314,21 @@ export async function deleteProduct(id: string | number) {
   return fetchWithAuth<void>(`/crud/products/${id}`, { method: "DELETE" });
 }
 
+export type ProduitsDetails = {
+  id?: string;
+  brand?: string | null;
+  sku?: string | null;
+  description_seo?: string | null;
+  rating_value?: number;
+  rating_count?: number;
+  availability?: string | null;
+  gtin?: string | null;
+  mpn?: string | null;
+  condition?: string | null;
+  price_valid_until?: string | null;
+  category_schema?: string | null;
+};
+
 export type ProductDetail = Product & {
     image_miniature?: string | null;
     galerie_json?: string[] | null;
@@ -324,6 +339,8 @@ export type ProductDetail = Product & {
     // nouveaux champs renvoyés par le back
     categorie_nom?: string | null;
     sous_categorie_nom?: string | null;
+    // ProduitsDetails
+    details?: ProduitsDetails | null;
   };
   
   // Adapte API_BASE à ta config (même base que getProducts)

@@ -35,6 +35,7 @@ import ProductDetail from "./pages/ProductDetail";
 import HomepageFeaturedProducts from "./pages/dashboard/HomepageFeaturedProducts";
 import Statistics from "./pages/dashboard/Statistics";
 import CategoryProductOrder from "./pages/dashboard/CategoryProductOrder";
+import ViewLogs from "./pages/dashboard/ViewLogs";
 
 const queryClient = new QueryClient();
 
@@ -174,6 +175,14 @@ const App = () => (
             element={
               <PrivateRoute>
                 <Statistics />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/dashboard/logs"
+            element={
+              <PrivateRoute>
+                <ViewLogs />
               </PrivateRoute>
             }
           />
