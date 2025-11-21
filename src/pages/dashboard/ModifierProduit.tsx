@@ -4,8 +4,9 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import { getCategories, getProductById, fetchWithAuth, ProduitsDetails } from "@/lib/api";
 import { imageUrl, safeProductImage, parseGallery } from "@/lib/images";
 import { MedicalButton } from "@/components/ui/medical-button";
-import { Save, CheckCircle, X } from "lucide-react";
+import { Save, X, ArrowLeft } from "lucide-react";
 import ProductDetailsForm from "@/components/admin/ProductDetailsForm";
+import { toast } from "sonner";
 
 export default function ModifierProduit() {
   const { id } = useParams<{ id: string }>();
@@ -23,10 +24,10 @@ export default function ModifierProduit() {
   const [newMiniature, setNewMiniature] = useState<File | null>(null);
   const [gallery, setGallery] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
-  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState<ProduitsDetails | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // --- Charger les catégories ---
   useEffect(() => {
@@ -83,10 +84,41 @@ export default function ModifierProduit() {
     if (file) setNewMiniature(file);
   };
 
+  // --- Reload product data ---
+  const reloadProduct = async () => {
+    if (!id) return;
+    try {
+      setLoading(true);
+      const data = await getProductById(id);
+      setTitre(data.titre || "");
+      setReference(data.reference || "");
+      setDescription(data.description_html || "");
+      setDescriptionCourte(data.description_courte || "");
+      setCategorieId(String(data.categorie_id || ""));
+      setPrix(data.prix || "");
+      setEstActif(Boolean(data.est_actif));
+
+      if (data.image_miniature) setMiniature(data.image_miniature);
+      const parsed = parseGallery(data.galerie_json) || [];
+      setGallery(Array.from(new Set(parsed)));
+
+      if (data.details) {
+        setDetails(data.details);
+      } else {
+        setDetails(null);
+      }
+    } catch (err) {
+      console.error("Error reloading product:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // --- Soumission ---
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
 
     if (!titre || !categorieId) {
       setError("Veuillez remplir tous les champs obligatoires");
@@ -125,11 +157,30 @@ export default function ModifierProduit() {
       });
       
       console.log("✅ Product updated successfully", result);
-      setSuccess(true);
-      setTimeout(() => navigate("/dashboard/produits"), 2000);
+      
+      // Show success toast
+      toast.success("Produit mis à jour avec succès !", {
+        description: "Les modifications ont été enregistrées.",
+        duration: 3000,
+      });
+      
+      // Reload product data to show updated values
+      await reloadProduct();
+      
+      // Clear file inputs
+      setNewMiniature(null);
+      setNewImages([]);
+      
     } catch (err: any) {
       console.error("❌ Error updating product:", err);
-      setError(err.message || "Erreur lors de la mise à jour du produit");
+      const errorMessage = err.message || "Erreur lors de la mise à jour du produit";
+      setError(errorMessage);
+      toast.error("Erreur lors de la mise à jour", {
+        description: errorMessage,
+        duration: 5000,
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -142,21 +193,29 @@ export default function ModifierProduit() {
 
   return (
     <DashboardLayout>
-      {success ? (
-        <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <CheckCircle className="text-green-500 w-16 h-16 mb-4" />
-          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-            Produit mis à jour avec succès !
-          </h2>
+      <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow space-y-6">
+        {/* Header with back button */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <MedicalButton
+              variant="outline"
+              size="sm"
+              onClick={() => navigate("/dashboard/produits")}
+              type="button"
+            >
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Retour à la liste
+            </MedicalButton>
+            <h1 className="text-2xl font-bold text-gray-800">
+              Modifier le produit
+            </h1>
+          </div>
         </div>
-      ) : (
+
         <form
           onSubmit={handleSubmit}
-          className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow space-y-6"
+          className="space-y-6"
         >
-          <h1 className="text-2xl font-bold text-gray-800 mb-4">
-            Modifier le produit
-          </h1>
 
           {error && <p className="text-red-600">{error}</p>}
 
@@ -352,14 +411,27 @@ export default function ModifierProduit() {
           />
 
           {/* Bouton submit */}
-          <div className="pt-4">
-            <MedicalButton type="submit" variant="primary" size="lg">
+          <div className="pt-4 flex gap-3">
+            <MedicalButton 
+              type="submit" 
+              variant="primary" 
+              size="lg"
+              disabled={isSubmitting}
+            >
               <Save className="w-5 h-5 mr-2" />
-              Mettre à jour le produit
+              {isSubmitting ? "Mise à jour..." : "Mettre à jour le produit"}
+            </MedicalButton>
+            <MedicalButton 
+              type="button"
+              variant="outline" 
+              size="lg"
+              onClick={() => navigate("/dashboard/produits")}
+            >
+              Annuler
             </MedicalButton>
           </div>
         </form>
-      )}
+      </div>
     </DashboardLayout>
   );
 }
