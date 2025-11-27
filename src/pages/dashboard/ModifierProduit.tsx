@@ -7,6 +7,7 @@ import { MedicalButton } from "@/components/ui/medical-button";
 import { Save, X, ArrowLeft } from "lucide-react";
 import ProductDetailsForm from "@/components/admin/ProductDetailsForm";
 import { toast } from "sonner";
+import Swal from "sweetalert2";
 
 export default function ModifierProduit() {
   const { id } = useParams<{ id: string }>();
@@ -173,12 +174,29 @@ export default function ModifierProduit() {
       
     } catch (err: any) {
       console.error("❌ Error updating product:", err);
-      const errorMessage = err.message || "Erreur lors de la mise à jour du produit";
+      const errorMessage: string =
+        err?.message || "Erreur lors de la mise à jour du produit";
+
       setError(errorMessage);
-      toast.error("Erreur lors de la mise à jour", {
-        description: errorMessage,
-        duration: 5000,
-      });
+
+      // If backend signals a unique constraint violation on reference/slug,
+      // show a clear SweetAlert message explaining what to do.
+      if (
+        typeof errorMessage === "string" &&
+        errorMessage.includes("Une valeur unique existe déjà")
+      ) {
+        await Swal.fire({
+          icon: "error",
+          title: "Référence déjà utilisée",
+          text: "Deux produits ne peuvent pas contenir la même référence. Essayez d'ajouter un « - » avec un numéro (ex: Veinax-2) ou bien un suffixe comme Homme, Femme, etc.",
+          confirmButtonColor: "#dc2626",
+        });
+      } else {
+        toast.error("Erreur lors de la mise à jour", {
+          description: errorMessage,
+          duration: 5000,
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
