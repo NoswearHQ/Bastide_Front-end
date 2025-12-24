@@ -6,6 +6,7 @@ type SeoProps = {
   canonical?: string;
   image?: string;
   type?: string; // website | article | product
+  robots?: string; // e.g., "noindex, follow"
 };
 
 const SITE_BASE = (import.meta as any).env.VITE_SITE_BASE_URL || "https://bastide.tn";
@@ -32,7 +33,7 @@ function upsertLink(rel: string, href: string) {
   el.setAttribute("href", href);
 }
 
-export function Seo({ title, description, canonical, image, type = "website" }: SeoProps) {
+export function Seo({ title, description, canonical, image, type = "website", robots }: SeoProps) {
   useEffect(() => {
     const pageUrl = canonical || (typeof window !== "undefined" ? window.location.href : SITE_BASE);
     const finalTitle = title ? `${title}` : "Bastide - Le confort médical";
@@ -41,6 +42,9 @@ export function Seo({ title, description, canonical, image, type = "website" }: 
 
     document.title = finalTitle;
     upsertMeta("description", finalDesc);
+    if (robots) {
+      upsertMeta("robots", robots);
+    }
     upsertLink("canonical", pageUrl);
 
     // Open Graph
@@ -55,7 +59,7 @@ export function Seo({ title, description, canonical, image, type = "website" }: 
     upsertMeta("twitter:title", finalTitle);
     upsertMeta("twitter:description", finalDesc);
     upsertMeta("twitter:image", finalImage);
-  }, [title, description, canonical, image, type]);
+  }, [title, description, canonical, image, type, robots]);
 
   return null;
 }

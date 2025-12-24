@@ -353,6 +353,17 @@ export type ProductDetail = Product & {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
   }
+
+  // Récupération d'un produit par slug (publique)
+  export async function getProductBySlug(slug: string): Promise<ProductDetail> {
+    const res = await fetch(`${API_BASE}/crud/products/slug/${encodeURIComponent(slug)}`, {
+      method: "GET",
+      headers: { Accept: "application/json" },
+      credentials: "include",
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res.json();
+  }
 // ---------- Endpoints CRUD Catégories ----------
 
 // ✅ Type complet aligné avec le contrôleur Symfony

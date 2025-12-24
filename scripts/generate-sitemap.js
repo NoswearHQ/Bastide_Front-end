@@ -120,14 +120,14 @@ function generateSitemap(articles = [], products = []) {
 `;
   });
 
-  // Ajouter les produits (format: /produit/{id}-{slug})
+  // Ajouter les produits (format: /produits/{slug})
   products.forEach(product => {
     if (product.slug && product.est_actif) {
-      const productUrl = `${SITE_BASE}/produit/${product.id}-${product.slug}`;
+      const productUrl = `${SITE_BASE}/produits/${product.slug}`;
       sitemap += `  <url>
     <loc>${productUrl}</loc>
     <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+    <priority>0.8</priority>
   </url>
 `;
     }

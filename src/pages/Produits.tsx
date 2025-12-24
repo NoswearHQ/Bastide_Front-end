@@ -29,7 +29,11 @@ function htmlDecode(input: string): string {
 
 // Helper function to generate product URL
 function getProductUrl(id: string | number, slug?: string | null, titre?: string): string {
-  const seoSlug = slug || (titre ? titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") : "");
+  // Use slug-based URL if slug exists, otherwise fallback to old format
+  if (slug) {
+    return `/produits/${slug}`;
+  }
+  const seoSlug = titre ? titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "") : "";
   return `/produit/${id}${seoSlug ? `-${seoSlug}` : ""}`;
 }
 
@@ -195,6 +199,33 @@ useEffect(() => {
   setSearchTerm((prev) => (prev !== qParam ? qParam : prev));
   setCurrentPage((prev) => (prev !== p ? p : prev));
 }, [params]);
+
+// Check if search returns exactly one product and redirect
+useEffect(() => {
+  if (debouncedSearchTerm && !selectedCatIds.length && currentPage === 1) {
+    getProducts({
+      search: debouncedSearchTerm,
+      page: 1,
+      limit: 2, // Check if exactly one result
+    })
+      .then((res) => {
+        // If exactly one product matches and it's an exact title match, redirect
+        if (res.total === 1 && res.rows.length === 1) {
+          const product = res.rows[0];
+          const searchLower = debouncedSearchTerm.toLowerCase().trim();
+          const titleLower = (product.titre || "").toLowerCase().trim();
+          
+          // Only redirect if it's an exact match
+          if (titleLower === searchLower && product.slug) {
+            navigate(`/produits/${product.slug}`, { replace: true });
+          }
+        }
+      })
+      .catch(() => {
+        // Ignore errors, continue with normal search
+      });
+  }
+}, [debouncedSearchTerm, selectedCatIds, currentPage, navigate]);
 
 // Charger les produits selon critères
 useEffect(() => {
@@ -471,12 +502,16 @@ const loadMoreCategories = async () => {
       />
     ));
 
+  // Check if we have search params - if so, add noindex
+  const hasSearchParams = searchTerm || selectedCatIds.length > 0 || currentPage > 1;
+  
   return (
     <Layout>
       <Seo
         title="Produits médicaux — Bastide Tunisie"
         description="Découvrez notre catalogue de matériel médical : mobilité, incontinence, confort et soins. Vente et location en Tunisie."
         canonical="https://bastide.tn/produits"
+        robots={hasSearchParams ? "noindex, follow" : undefined}
       />
       {/* Hero Slider */}
       <section>

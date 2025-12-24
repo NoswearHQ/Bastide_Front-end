@@ -313,7 +313,7 @@ export default function Home() {
                       </span>
                       <MedicalButton variant="outline" size="sm" asChild>
                         <Link
-                          to={`/produit/${product.id}-${product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}`}
+                          to={product.slug ? `/produits/${product.slug}` : `/produit/${product.id}-${product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}`}
                         >
                           Découvrir
                         </Link>

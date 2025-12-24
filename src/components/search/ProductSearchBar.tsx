@@ -105,8 +105,8 @@ export default function ProductSearchBar() {
           ) : results.length > 0 ? (
             <div className="py-2">
               {results.map((product) => {
-                const seoSlug = product.slug || product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
-                const productUrl = `/produit/${product.id}-${seoSlug}`;
+                // Use slug-based URL if slug exists
+                const productUrl = product.slug ? `/produits/${product.slug}` : `/produit/${product.id}-${product.titre.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")}`;
                 return (
                 <Link
                   key={product.id}

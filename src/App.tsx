@@ -32,6 +32,7 @@ import ArticleEdit from "./pages/dashboard/ArticleEdit";
 import ArticleDetail from "./pages/ArticleDetail";
 import ModifierCategorie from "./pages/dashboard/ModifierCategorie";
 import ProductDetail from "./pages/ProductDetail";
+import ProduitBySlug from "./pages/ProduitBySlug";
 import HomepageFeaturedProducts from "./pages/dashboard/HomepageFeaturedProducts";
 import Statistics from "./pages/dashboard/Statistics";
 import CategoryProductOrder from "./pages/dashboard/CategoryProductOrder";
@@ -60,6 +61,7 @@ const App = () => (
           <Route path="/cookies" element={<Cookies />} />
           <Route path="/articles/:slug" element={<ArticleDetail />} />
           <Route path="/produit/:id" element={<ProductDetail />} />
+          <Route path="/produits/:slug" element={<ProduitBySlug />} />
           <Route
   path="/dashboard"
   element={
