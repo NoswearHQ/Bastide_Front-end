@@ -397,7 +397,7 @@ export default function Contact() {
       Avenue de l’Aouina<br />
       Tunis, Tunisie<br />
       <a
-        href="https://maps.app.goo.gl/Noj54UvC9Vx4iP6WA"
+        href="https://www.google.com/maps?q=V744+6CJ+Bastide+aouina,+Rue+Nelson+Mandela,+Tunis&ftid=0x12e2cb000ed8105d:0xb26a706026966be0&entry=gps&shh=CAE&lucs=,94297699,94275415,94284481,94231188,94280568,47071704,94218641,94282134,94286869&g_ep=CAISEjI2LjA1LjEuODYxMzIyMjEwMBgAINeCAypRLDk0Mjk3Njk5LDk0Mjc1NDE1LDk0Mjg0NDgxLDk0MjMxMTg4LDk0MjgwNTY4LDQ3MDcxNzA0LDk0MjE4NjQxLDk0MjgyMTM0LDk0Mjg2ODY5QgJUTg%3D%3D&skid=3ceaa681-895a-4918-9698-437c24d4942f&g_st=ic"
         target="_blank"
         rel="noopener noreferrer"
         className="text-medical-primary hover:underline text-sm"
@@ -408,7 +408,7 @@ export default function Contact() {
 
     <div className="aspect-video rounded-lg overflow-hidden shadow-medical">
       <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1279.6067068790628!2d10.268620799999999!3d36.8509026!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x12fd352f97ef8de9%3A0x5b94d7e76cc84408!2sBastide%20L&#39;Aouina!5e0!3m2!1sfr!2stn!4v1728984988771!5m2!1sfr!2stn"
+        src="https://www.google.com/maps?q=V744+6CJ+Bastide+aouina,+Rue+Nelson+Mandela,+Tunis&ftid=0x12e2cb000ed8105d:0xb26a706026966be0&entry=gps&shh=CAE&lucs=,94297699,94275415,94284481,94231188,94280568,47071704,94218641,94282134,94286869&g_ep=CAISEjI2LjA1LjEuODYxMzIyMjEwMBgAINeCAypRLDk0Mjk3Njk5LDk0Mjc1NDE1LDk0Mjg0NDgxLDk0MjMxMTg4LDk0MjgwNTY4LDQ3MDcxNzA0LDk0MjE4NjQxLDk0MjgyMTM0LDk0Mjg2ODY5QgJUTg%3D%3D&skid=3ceaa681-895a-4918-9698-437c24d4942f&g_st=ic&output=embed"
         width="100%"
         height="100%"
         style={{ border: 0 }}

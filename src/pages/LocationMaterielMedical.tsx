@@ -146,7 +146,7 @@ export default function LocationMateriel() {
             href={
               index === 0
                 ? "https://maps.app.goo.gl/QF2faGBzRSJk7nqg8"
-                : "https://maps.app.goo.gl/Noj54UvC9Vx4iP6WA"
+                : "https://www.google.com/maps?q=V744+6CJ+Bastide+aouina,+Rue+Nelson+Mandela,+Tunis&ftid=0x12e2cb000ed8105d:0xb26a706026966be0&entry=gps&shh=CAE&lucs=,94297699,94275415,94284481,94231188,94280568,47071704,94218641,94282134,94286869&g_ep=CAISEjI2LjA1LjEuODYxMzIyMjEwMBgAINeCAypRLDk0Mjk3Njk5LDk0Mjc1NDE1LDk0Mjg0NDgxLDk0MjMxMTg4LDk0MjgwNTY4LDQ3MDcxNzA0LDk0MjE4NjQxLDk0MjgyMTM0LDk0Mjg2ODY5QgJUTg%3D%3D&skid=3ceaa681-895a-4918-9698-437c24d4942f&g_st=ic"
             }
             target="_blank"
             rel="noopener noreferrer"
